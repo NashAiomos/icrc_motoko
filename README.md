@@ -2,7 +2,7 @@
 This repo contains the implementation of the 
 [ICRC-1](https://github.com/dfinity/ICRC-1) token standard. 
 
-## Getting Started
+## Local Test Deployment
 
 - Launch the basic token with all the standard functions for ICRC-1
   Install the [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install) package manager 
