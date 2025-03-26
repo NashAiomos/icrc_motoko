@@ -7,7 +7,7 @@ This repo contains the implementation of the
 - Launch the basic token with all the standard functions for ICRC-1
   Install the [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install) package manager 
 
-  ```motoko
+```motoko
     git clone https://github.com/NashAiomos/icrc1_motoko
     cd icrc1_motoko
     dfx extension install mops
@@ -35,9 +35,11 @@ This repo contains the implementation of the
         };
         advanced_settings = null;
     })'
-  ```
-
-`advanced_settings`:
 ```
+
+
+```
+advanced_settings:
+
 type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestamp; permitted_drift : Timestamp }
 ```
