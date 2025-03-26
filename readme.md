@@ -15,8 +15,8 @@ This repo contains the implementation of the
     dfx start --background --clean
 
     dfx deploy icrc1 --argument '( record {                    
-        name = "vUSD";
-        symbol = "VUSD";
+        name = "aaa";
+        symbol = "aaa";
         decimals = 8;
         fee = 1_000;
         max_supply = 100_000_000_000_000;
