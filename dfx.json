@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "dfx": "0.22.0",
+    "canisters": {
+        "icrc1": {
+            "type": "motoko",
+            "main": "src/ICRC1/Canisters/Token.mo"
+        }
+    },
+    "defaults": {
+        "build": {
+            "packtool": "mops sources",
+            "args": ""
+        }
+    },
+    "networks": {
+        "local": {
+            "bind": "127.0.0.1:8000",
+            "type": "ephemeral"
+        }
+    }
+}
