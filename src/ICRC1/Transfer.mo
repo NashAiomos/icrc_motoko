@@ -23,7 +23,7 @@ import Utils "Utils";
 module {
     let { SB } = Utils;
 
-    /// Checks if a transaction memo is valid
+    /// 检查交易备注是否有效
     public func validate_memo(memo : ?T.Memo) : Bool {
         switch (memo) {
             case (?bytes) {
@@ -33,7 +33,7 @@ module {
         };
     };
 
-    /// Checks if the `created_at_time` of a transfer request is before the accepted time range
+    /// 检查转账请求的 `created_at_time` 是否在可接受时间范围之前
     public func is_too_old(token : T.TokenData, created_at_time : Nat64) : Bool {
         let { permitted_drift; transaction_window } = token;
 
@@ -41,17 +41,17 @@ module {
         Nat64.toNat(created_at_time) < lower_bound;
     };
 
-    /// Checks if the `created_at_time` of a transfer request has not been reached yet relative to the canister's time.
+    /// 检查转账请求的 `created_at_time` 是否相对于罐子的当前时间还未到达
     public func is_in_future(token : T.TokenData, created_at_time : Nat64) : Bool {
         let upper_bound = Time.now() + token.permitted_drift;
         Nat64.toNat(created_at_time) > upper_bound;
     };
 
-    /// Checks if there is a duplicate transaction that matches the transfer request in the main canister.
+    /// 检查主罐中是否存在与转账请求一致的重复交易
     ///
-    /// If a duplicate is found, the function returns an error (`#err`) with the duplicate transaction's index.
+    /// 如果找到了重复的交易，则函数返回一个包含重复交易索引的错误 (`#err`)
     public func deduplicate(token : T.TokenData, tx_req : T.TransactionRequest) : Result.Result<(), Nat> {
-        // only deduplicates if created_at_time is set
+        // 仅在设置了 created_at_time 时进行去重
         if (tx_req.created_at_time == null) {
             return #ok();
         };
@@ -127,7 +127,7 @@ module {
         #ok();
     };
 
-    /// Checks if a transfer fee is valid
+    /// 检查转账手续费是否有效
     public func validate_fee(
         token : T.TokenData,
         opt_fee : ?T.Balance,
@@ -148,7 +148,7 @@ module {
         true;
     };
 
-    /// Checks if a transfer request is valid
+    /// 检查转账请求是否有效
     public func validate_request(
         token : T.TokenData,
         tx_req : T.TransactionRequest,

@@ -20,8 +20,7 @@ import Utils "Utils";
 import Transfer "Transfer";
 import Archive "Canisters/Archive";
 
-/// The ICRC1 class with all the functions for creating an
-/// ICRC1 token on the Internet Computer
+/// ICRC1 类，包含在互联网计算机上创建 ICRC1 代币的所有函数
 module {
     let { SB } = Utils;
 
@@ -64,7 +63,7 @@ module {
     public let MAX_TRANSACTION_BYTES : Nat64 = 196;
     public let MAX_TRANSACTIONS_PER_REQUEST = 5000;
 
-    /// Initialize a new ICRC-1 token
+    /// 初始化一个新的 ICRC-1 代币
     public func init(args : T.InitArgs) : T.TokenData {
         let {
             name;
@@ -103,7 +102,7 @@ module {
 
             if (not Account.validate(account)) {
                 Debug.trap(
-                    "Invalid Account: Account at index " # debug_show i # " is invalid in 'initial_balances'",
+                    "无效账户：'initial_balances' 中索引为 " # debug_show i # " 的账户无效",
                 );
             };
 
@@ -143,78 +142,75 @@ module {
         };
     };
 
-    /// Retrieve the name of the token
+    /// 获取代币名称
     public func name(token : T.TokenData) : Text {
         token.name;
     };
 
-    /// Retrieve the symbol of the token
+    /// 获取代币符号
     public func symbol(token : T.TokenData) : Text {
         token.symbol;
     };
 
-    /// Retrieve the number of decimals specified for the token
+    /// 获取代币的小数位数
     public func decimals({ decimals } : T.TokenData) : Nat8 {
         decimals;
     };
 
-    /// Retrieve the fee for each transfer
+    /// 获取每次转账的手续费
     public func fee(token : T.TokenData) : T.Balance {
         token._fee;
     };
 
-    /// Set the fee for each transfer
+    /// 设置每次转账的手续费
     public func set_fee(token : T.TokenData, fee : Nat) {
         token._fee := fee;
     };
 
-    /// Retrieve all the metadata of the token
+    /// 获取代币所有元数据
     public func metadata(token : T.TokenData) : [T.MetaDatum] {
         SB.toArray(token.metadata);
     };
 
-    /// Returns the total supply of circulating tokens
+    /// 返回流通中的代币总供应量
     public func total_supply(token : T.TokenData) : T.Balance {
         token._minted_tokens - token._burned_tokens;
     };
 
-    /// Returns the total supply of minted tokens
+    /// 返回已铸造代币的总供应量
     public func minted_supply(token : T.TokenData) : T.Balance {
         token._minted_tokens;
     };
 
-    /// Returns the total supply of burned tokens
+    /// 返回已销毁代币的总供应量
     public func burned_supply(token : T.TokenData) : T.Balance {
         token._burned_tokens;
     };
 
-    /// Returns the maximum supply of tokens
+    /// 返回代币的最大供应量
     public func max_supply(token : T.TokenData) : T.Balance {
         token.max_supply;
     };
 
-    /// Returns the account with the permission to mint tokens
+    /// 返回具有铸造代币权限的账户
     ///
-    /// Note: **The minting account can only participate in minting
-    /// and burning transactions, so any tokens sent to it will be
-    /// considered burned.**
-
+    /// 注意：**铸造账户仅参与铸造和销毁交易，因此发送到该账户的任何代币将被视为销毁。**
     public func minting_account(token : T.TokenData) : T.Account {
         token.minting_account;
     };
 
-    /// Retrieve the balance of a given account
+    /// 获取指定账户的余额
     public func balance_of({ accounts } : T.TokenData, account : T.Account) : T.Balance {
         let encoded_account = Account.encode(account);
         Utils.get_balance(accounts, encoded_account);
     };
 
-    /// Returns an array of standards supported by this token
+    /// 返回该代币支持的标准数组
     public func supported_standards(token : T.TokenData) : [T.SupportedStandard] {
         SB.toArray(token.supported_standards);
     };
 
-    /// Formats a float to a nat balance and applies the correct number of decimal places
+    /// 将浮点数格式化为 nat 余额，并应用正确的小数位数
     public func balance_from_float(token : T.TokenData, float : Float) : T.Balance {
         if (float <= 0) {
             return 0;
@@ -225,7 +221,7 @@ module {
         Int.abs(Float.toInt(float_with_decimals));
     };
 
-    /// Transfers tokens from one account to another account (minting and burning included)
+    /// 从一个账户转账到另一个账户（包括铸造和销毁）
     public func transfer(
         token : T.TokenData,
         args : T.TransferArgs,
@@ -256,7 +252,7 @@ module {
 
         let { encoded; amount } = tx_req; 
 
-        // process transaction
+        // 处理交易
         switch(tx_req.kind){
             case(#mint){
                 Utils.mint_balance(token, encoded.to, amount);
@@ -267,23 +263,23 @@ module {
             case(#transfer){
                 Utils.transfer_balance(token, tx_req);
 
-                // burn fee
+                // 销毁手续费
                 Utils.burn_balance(token, encoded.from, token._fee);
             };
         };
 
-        // store transaction
+        // 存储交易
         let index = SB.size(token.transactions) + token.archive.stored_txs;
         let tx = Utils.req_to_tx(tx_req, index);
         SB.add(token.transactions, tx);
 
-        // transfer transaction to archive if necessary
+        // 如果需要，将交易转移到归档
         await update_canister(token);
 
         #Ok(tx.index);
     };
 
-    /// Helper function to mint tokens with minimum args
+    /// 辅助函数，使用最少参数铸造代币
     public func mint(token : T.TokenData, args : T.Mint, caller : Principal) : async T.TransferResult {
 
         if (caller != token.minting_account.owner) {
@@ -303,7 +299,7 @@ module {
         await transfer(token, transfer_args, caller);
     };
 
-    /// Helper function to burn tokens with minimum args
+    /// 辅助函数，使用最少参数销毁代币
     public func burn(token : T.TokenData, args : T.BurnArgs, caller : Principal) : async T.TransferResult {
 
         let transfer_args : T.TransferArgs = {
@@ -314,13 +310,13 @@ module {
         await transfer(token, transfer_args, caller);
     };
 
-    /// Returns the total number of transactions that have been processed by the given token.
+    /// 返回给定代币已处理的交易总数
     public func total_transactions(token : T.TokenData) : Nat {
         let { archive; transactions } = token;
         archive.stored_txs + SB.size(transactions);
     };
 
-    /// Retrieves the transaction specified by the given `tx_index`
+    /// 检索由给定 `tx_index` 指定的交易
     public func get_transaction(token : T.TokenData, tx_index : T.TxIndex) : async ?T.Transaction {
         let { archive; transactions } = token;
 
@@ -334,11 +330,11 @@ module {
         };
     };
 
-    /// Retrieves the transactions specified by the given range
+    /// 检索由给定范围指定的交易
     public func get_transactions(token : T.TokenData, req : T.GetTransactionsRequest) : T.GetTransactionsResponse {
         let { archive; transactions } = token;
 
-        var first_index = 0xFFFF_FFFF_FFFF_FFFF; // returned if no transactions are found
+        var first_index = 0xFFFF_FFFF_FFFF_FFFF; // 如果找不到交易则返回此值
 
         let req_end = req.start + req.length;
         let tx_end = archive.stored_txs + SB.size(transactions);
@@ -392,9 +388,9 @@ module {
         };
     };
 
-    // Updates the token's data and manages the transactions
+    // 更新代币数据并管理交易
     //
-    // **added at the end of any function that creates a new transaction**
+    // 在创建新交易的任何函数末尾添加
     func update_canister(token : T.TokenData) : async () {
         let txs_size = SB.size(token.transactions);
 
@@ -403,8 +399,7 @@ module {
         };
     };
 
-    // Moves the transactions from the ICRC1 canister to the archive canister
-    // and returns a boolean that indicates the success of the data transfer
+    // 将交易从 ICRC1 容器转移到归档容器，并返回一个指示数据传输是否成功的布尔值
     func append_transactions(token : T.TokenData) : async () {
         let { archive; transactions } = token;
 

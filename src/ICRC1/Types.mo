@@ -64,7 +64,7 @@ module {
         created_at_time : ?Nat64;
     };
 
-    /// Arguments for a transfer operation
+    /// 转账操作的参数
     public type TransferArgs = {
         from_subaccount : ?Subaccount;
         to : Account;
@@ -72,8 +72,8 @@ module {
         fee : ?Balance;
         memo : ?Blob;
 
-        /// The time at which the transaction was created.
-        /// If this is set, the canister will check for duplicate transactions and reject them.
+        /// 交易创建的时间
+        /// 如果设置，则 canister 将检查重复交易并拒绝
         created_at_time : ?Nat64;
     };
 
@@ -86,7 +86,7 @@ module {
         created_at_time : ?Nat64;
     };
 
-    /// Internal representation of a transaction request
+    /// 交易请求的内部表示
     public type TransactionRequest = {
         kind : TxKind;
         from : Account;
@@ -129,64 +129,64 @@ module {
         #Err : TransferError;
     };
 
-    /// Interface for the ICRC token canister
+    /// ICRC token canister 的接口
     public type TokenInterface = actor {
 
-        /// Returns the name of the token
+        /// 返回 token 的名称
         icrc1_name : shared query () -> async Text;
 
-        /// Returns the symbol of the token
+        /// 返回 token 的符号
         icrc1_symbol : shared query () -> async Text;
 
-        /// Returns the number of decimals the token uses
+        /// 返回 token 使用的小数位数
         icrc1_decimals : shared query () -> async Nat8;
 
-        /// Returns the fee charged for each transfer
+        /// 返回每次转账收取的费用
         icrc1_fee : shared query () -> async Balance;
 
-        /// Returns the tokens metadata
+        /// 返回 token 的元数据
         icrc1_metadata : shared query () -> async MetaData;
 
-        /// Returns the total supply of the token
+        /// 返回 token 的总供应量
         icrc1_total_supply : shared query () -> async Balance;
 
-        /// Returns the account that is allowed to mint new tokens
+        /// 返回允许铸造新 token 的账户
         icrc1_minting_account : shared query () -> async ?Account;
 
-        /// Returns the balance of the given account
+        /// 返回指定账户的余额
         icrc1_balance_of : shared query (Account) -> async Balance;
 
-        /// Transfers the given amount of tokens from the sender to the recipient
+        /// 从发送者转移指定数量的 token 到接收者
         icrc1_transfer : shared (TransferArgs) -> async TransferResult;
 
-        /// Returns the standards supported by this token's implementation
+        /// 返回此 token 实现所支持的标准
         icrc1_supported_standards : shared query () -> async [SupportedStandard];
 
     };
 
     public type TxCandidBlob = Blob;
 
-    /// The Interface for the Archive canister
+    /// Archive canister 的接口
     public type ArchiveInterface = actor {
-        /// Appends the given transactions to the archive.
-        /// > Only the Ledger canister is allowed to call this method
+        /// 将给定的交易追加到档案中
+        /// > 只有 Ledger canister 被允许调用此方法
         append_transactions : shared ([Transaction]) -> async Result.Result<(), Text>;
 
-        /// Returns the total number of transactions stored in the archive
+        /// 返回存储在 archive 中的交易总数
         total_transactions : shared query () -> async Nat;
 
-        /// Returns the transaction at the given index
+        /// 返回指定索引处的交易
         get_transaction : shared query (TxIndex) -> async ?Transaction;
 
-        /// Returns the transactions in the given range
+        /// 返回给定范围内的交易
         get_transactions : shared query (GetTransactionsRequest) -> async TransactionRange;
 
-        /// Returns the number of bytes left in the archive before it is full
-        /// > The capacity of the archive canister is 32GB
+        /// 返回 archive 在满之前剩余的字节数
+        /// > archive canister 的容量为 375GB
         remaining_capacity : shared query () -> async Nat;
     };
 
-    /// Initial arguments for the setting up the icrc1 token canister
+    /// 初始化 icrc1 token canister 的参数
     public type InitArgs = {
         name : Text;
         symbol : Text;
@@ -197,11 +197,11 @@ module {
         initial_balances : [(Account, Balance)];
         min_burn_amount : Balance;
 
-        /// optional settings for the icrc1 canister
+        /// icrc1 canister 的可选设置
         advanced_settings: ?AdvancedSettings
     };
 
-    /// [InitArgs](#type.InitArgs) with optional fields for initializing a token canister
+    /// [InitArgs](#type.InitArgs)，带有初始化 token canister 的可选字段
     public type TokenInitArgs = {
         name : Text;
         symbol : Text;
@@ -211,15 +211,15 @@ module {
         initial_balances : [(Account, Balance)];
         min_burn_amount : Balance;
 
-        /// optional value that defaults to the caller if not provided
+        /// 如果未提供，则默认为调用者的可选值
         minting_account : ?Account;
 
         advanced_settings: ?AdvancedSettings;
     };
 
-    /// Additional settings for the [InitArgs](#type.InitArgs) type during initialization of an icrc1 token canister
+    /// 在初始化 icrc1 token canister 时，[InitArgs](#type.InitArgs) 的其他设置
     public type AdvancedSettings = {
-        /// needed if a token ever needs to be migrated to a new canister
+        /// 如果 token 需要迁移到新 canister，则需要此项
         burned_tokens : Balance; 
         transaction_window : Timestamp;
         permitted_drift : Timestamp;
@@ -227,70 +227,70 @@ module {
 
     public type AccountBalances = StableTrieMap<EncodedAccount, Balance>;
 
-    /// The details of the archive canister
+    /// archive canister 的详细信息
     public type ArchiveData = {
-        /// The reference to the archive canister
+        /// archive canister 的引用
         var canister : ArchiveInterface;
 
-        /// The number of transactions stored in the archive
+        /// 存储在 archive 中的交易数量
         var stored_txs : Nat;
     };
 
-    /// The state of the token canister
+    /// token canister 的状态
     public type TokenData = {
-        /// The name of the token
+        /// token 的名称
         name : Text;
 
-        /// The symbol of the token
+        /// token 的符号
         symbol : Text;
 
-        /// The number of decimals the token uses
+        /// token 使用的小数位数
         decimals : Nat8;
 
-        /// The fee charged for each transaction
+        /// 每笔交易收取的费用
         var _fee : Balance;
 
-        /// The maximum supply of the token
+        /// token 的最大供应量
         max_supply : Balance;
 
-        /// The total amount of minted tokens
+        /// 铸造的 token 总量
         var _minted_tokens : Balance;
 
-        /// The total amount of burned tokens
+        /// 销毁的 token 总量
         var _burned_tokens : Balance;
 
-        /// The account that is allowed to mint new tokens
-        /// On initialization, the maximum supply is minted to this account
+        /// 允许铸造新 tokens 的账户
+        /// 初始化时，最大供应量被铸造到此账户
         minting_account : Account;
 
-        /// The balances of all accounts
+        /// 所有账户的余额
         accounts : AccountBalances;
 
-        /// The metadata for the token
+        /// token 的元数据
         metadata : StableBuffer<MetaDatum>;
 
-        /// The standards supported by this token's implementation
+        /// 此 token 实现所支持的标准
         supported_standards : StableBuffer<SupportedStandard>;
 
-        /// The time window in which duplicate transactions are not allowed
+        /// 不允许重复交易的时间窗口
         transaction_window : Nat;
 
-        /// The minimum amount of tokens that must be burned in a transaction
+        /// 交易中必须销毁的最小 token 数量
         min_burn_amount : Balance;
 
-        /// The allowed difference between the ledger time and the time of the device the transaction was created on
+        /// 账本时间与交易创建设备时间之间允许的差异
         permitted_drift : Nat;
 
-        /// The recent transactions that have been processed by the ledger.
-        /// Only the last 2000 transactions are stored before being archived.
+        /// 由账本处理的最近交易。
+        /// 仅存储最后2000笔交易，然后归档。
         transactions : StableBuffer<Transaction>;
 
-        /// The record that stores the details to the archive canister and number of transactions stored in it
+        /// 存储 archive canister 详细信息及其中存储的交易数量的记录
         archive : ArchiveData;
     };
 
     // Rosetta API
-    /// The type to request a range of transactions from the ledger canister
+    /// 从账本 canister 请求一段交易的类型
     public type GetTransactionsRequest = {
         start : TxIndex;
         length : Nat;
@@ -303,35 +303,35 @@ module {
     public type QueryArchiveFn = shared query (GetTransactionsRequest) -> async TransactionRange;
 
     public type ArchivedTransaction = {
-        /// The index of the first transaction to be queried in the archive canister
+        /// 待查询的 archive canister 中首个交易的索引
         start : TxIndex;
-        /// The number of transactions to be queried in the archive canister
+        /// 待查询的 archive canister 中的交易数量
         length : Nat;
 
-        /// The callback function to query the archive canister
+        /// 用于查询 archive canister 的回调函数
         callback: QueryArchiveFn;
     };
 
     public type GetTransactionsResponse = {
-        /// The number of valid transactions in the ledger and archived canisters that are in the given range
+        /// 指定范围内账本和 archive canister 中有效交易的数量
         log_length : Nat;
 
-        /// the index of the first tx in the `transactions` field
+        /// `transactions` 字段中第一笔交易的索引
         first_index : TxIndex;
 
-        /// The transactions in the ledger canister that are in the given range
+        /// 账本 canister 中处于给定范围的交易
         transactions : [Transaction];
 
-        /// Pagination request for archived transactions in the given range
+        /// 给定范围内 archive canister 的分页请求
         archived_transactions : [ArchivedTransaction];
     };
 
-    /// Functions supported by the rosetta 
+    /// Rosetta 所支持的功能
     public type RosettaInterface = actor {
         get_transactions : shared query (GetTransactionsRequest) -> async GetTransactionsResponse;
     };
 
-    /// Interface of the ICRC token and Rosetta canister
+    /// ICRC token 及 Rosetta canister 的接口
     public type FullInterface = TokenInterface and RosettaInterface;
 
 };

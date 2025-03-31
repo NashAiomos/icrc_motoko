@@ -26,7 +26,7 @@ shared ({ caller = _owner }) actor class Token(
 
     stable let token = ICRC1.init(icrc1_args);
 
-    /// Functions for the ICRC1 token standard
+    /// ICRC1 代币标准的函数
     public shared query func icrc1_name() : async Text {
         ICRC1.name(token);
     };
@@ -75,17 +75,17 @@ shared ({ caller = _owner }) actor class Token(
         await ICRC1.burn(token, args, caller);
     };
 
-    // Functions for integration with the rosetta standard
+    // 用于集成 Rosetta 标准的函数
     public shared query func get_transactions(req : ICRC1.GetTransactionsRequest) : async ICRC1.GetTransactionsResponse {
         ICRC1.get_transactions(token, req);
     };
 
-    // Additional functions not included in the ICRC1 standard
+    // ICRC1 标准之外的附加函数
     public shared func get_transaction(i : ICRC1.TxIndex) : async ?ICRC1.Transaction {
         await ICRC1.get_transaction(token, i);
     };
 
-    // Deposit cycles into this canister.
+    // 向 canister 存入 cycles
     public shared func deposit_cycles() : async () {
         let amount = ExperimentalCycles.available();
         let accepted = ExperimentalCycles.accept(amount);

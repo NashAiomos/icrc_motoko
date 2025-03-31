@@ -24,7 +24,7 @@ import T "Types";
 module {
     type Iter<A> = Iter.Iter<A>;
 
-    /// Checks if a subaccount is valid
+    /// 检查子账户是否有效
     public func validate_subaccount(subaccount : ?T.Subaccount) : Bool {
         switch (subaccount) {
             case (?bytes) {
@@ -34,7 +34,7 @@ module {
         };
     };
 
-    /// Checks if an account is valid
+    /// 检查账户是否有效
     public func validate(account : T.Account) : Bool {
         let is_anonymous = Principal.isAnonymous(account.owner);
         let invalid_size = Principal.toBlob(account.owner).size() > 29;
@@ -80,7 +80,7 @@ module {
         );
     };
 
-    /// Implementation of ICRC1's Textual representation of accounts [Encoding Standard](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#encoding)
+    /// 实现 ICRC1 账户的文本表示形式 [编码标准](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#encoding)
     public func encode({ owner; subaccount } : T.Account) : T.EncodedAccount {
         let owner_blob = Principal.toBlob(owner);
 
@@ -101,7 +101,7 @@ module {
         };
     };
 
-    /// Implementation of ICRC1's Textual representation of accounts [Decoding Standard](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#decoding)
+    /// 实现 ICRC1 账户的文本表示形式 [解码标准](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#decoding)
     public func decode(encoded : T.EncodedAccount) : ?T.Account {
         let bytes = Blob.toArray(encoded);
         var size = bytes.size();
@@ -150,7 +150,7 @@ module {
         };
     };
 
-    /// Converts an ICRC-1 Account from its Textual representation to the `Account` type
+    /// 将 ICRC-1 账户从文本表示转换为 Account 类型
     public func fromText(encoded : Text) : ?T.Account {
         let p = Principal.fromText(encoded);
         let blob = Principal.toBlob(p);
@@ -158,7 +158,7 @@ module {
         decode(blob);
     };
 
-    /// Converts an ICRC-1 `Account` to its Textual representation
+    /// 将 ICRC-1 Account 转换为文本表示
     public func toText(account : T.Account) : Text {
         let blob = encode(account);
         let principal = Principal.fromBlob(blob);
@@ -180,7 +180,7 @@ module {
             return Nat8.fromNat(Nat32.toNat(digit));
         };
 
-        // lowercase
+        // 小写
         let digit = charCode - Char.toNat32('a') + 10;
 
         return Nat8.fromNat(Nat32.toNat(digit));

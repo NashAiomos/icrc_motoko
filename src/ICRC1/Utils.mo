@@ -22,7 +22,7 @@ import Account "Account";
 import T "Types";
 
 module {
-    // Creates a Stable Buffer with the default metadata and returns it.
+    // 创建具有默认元数据的 StableBuffer 并返回它。
     public func init_metadata(args : T.InitArgs) : StableBuffer.StableBuffer<T.MetaDatum> {
         let metadata = SB.initPresized<T.MetaDatum>(4);
         SB.add(metadata, ("icrc1:fee", #Nat(args.fee)));
@@ -38,7 +38,7 @@ module {
         url = "https://github.com/dfinity/ICRC-1";
     };
 
-    // Creates a Stable Buffer with the default supported standards and returns it.
+    // 创建具有默认支持标准的 StableBuffer 并返回它。
     public func init_standards() : StableBuffer.StableBuffer<T.SupportedStandard> {
         let standards = SB.initPresized<T.SupportedStandard>(4);
         SB.add(standards, default_standard);
@@ -46,15 +46,14 @@ module {
         standards;
     };
 
-    // Returns the default subaccount for cases where a user does
-    // not specify it.
+    // 返回当用户未指定子账户时的默认子账户。
     public func default_subaccount() : T.Subaccount {
         Blob.fromArray(
             Array.tabulate(32, func(_ : Nat) : Nat8 { 0 }),
         );
     };
 
-    // this is a local copy of deprecated Hash.hashNat8 (redefined to suppress the warning)
+    // 这是已废弃 Hash.hashNat8 ，重新定义以避免警告。
     func hashNat8(key : [Nat32]) : Hash.Hash {
         var hash : Nat32 = 0;
         for (natOfKey in key.vals()) {
@@ -68,7 +67,7 @@ module {
         return hash;
     };
 
-    // Computes a hash from the least significant 32-bits of `n`, ignoring other bits.
+    // 从 `n` 的最末32位计算哈希，忽略其他位。
     public func hash(n : Nat) : Hash.Hash {
         let j = Nat32.fromNat(n);
         hashNat8([
@@ -79,8 +78,7 @@ module {
         ]);
     };
 
-    // Formats the different operation arguements into
-    // a `TransactionRequest`, an internal type to access fields easier.
+    // 将不同操作参数格式化为 `TransactionRequest`，一种便于访问字段的内部类型。
     public func create_transfer_req(
         args : T.TransferArgs,
         owner : Principal,
@@ -124,7 +122,7 @@ module {
         };
     };
 
-    // Transforms the transaction kind from `variant` to `Text`
+    // 将交易类型从 variant 转换为 Text
     public func kind_to_text(kind : T.TxKind) : Text {
         switch (kind) {
             case (#mint) "MINT";
@@ -133,7 +131,7 @@ module {
         };
     };
 
-    // Formats the tx request into a finalised transaction
+    // 将交易请求格式化为最终交易
     public func req_to_tx(tx_req : T.TransactionRequest, index: Nat) : T.Transaction {
 
         {
@@ -162,7 +160,7 @@ module {
         (n + d - 1) / d;
     };
 
-    /// Retrieves the balance of an account
+    /// 检索账户余额
     public func get_balance(accounts : T.AccountBalances, encoded_account : T.EncodedAccount) : T.Balance {
         let res = STMap.get(
             accounts,
@@ -179,7 +177,7 @@ module {
         };
     };
 
-    /// Updates the balance of an account
+    /// 更新账户余额
     public func update_balance(
         accounts : T.AccountBalances,
         encoded_account : T.EncodedAccount,
@@ -199,8 +197,7 @@ module {
         };
     };
 
-    // Transfers tokens from the sender to the
-    // recipient in the tx request
+    // 在交易请求中将代币从发送方转移给接收方
     public func transfer_balance(
         token : T.TokenData,
         tx_req : T.TransactionRequest,
@@ -256,7 +253,7 @@ module {
         token._burned_tokens += amount;
     };
 
-    // Stable Buffer Module with some additional functions
+    // 附加函数的 StableBuffer 模块
     public let SB = {
         StableBuffer with slice = func<A>(buffer : T.StableBuffer<A>, start : Nat, end : Nat) : [A] {
             let size = SB.size(buffer);
