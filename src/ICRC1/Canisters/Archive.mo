@@ -30,7 +30,7 @@ shared ({ caller = ledger_canister_id }) actor class Archive() : async T.Archive
     stable let MEMORY_PER_PAGE : Nat64 = Nat64.fromNat(64 * KiB);
     stable let MIN_PAGES : Nat64 = 32; // 2MiB == 32 * 64KiB
     stable var PAGES_TO_GROW : Nat64 = 2048; // 128MiB
-    stable let MAX_MEMORY = 375 * GiB; // 最大是 500GiB, 这里使用 375GiB
+    stable let MAX_MEMORY = 375 * GiB; // 一个 canister 最大是 500GiB, 这里使用 375GiB
 
     stable let BUCKET_SIZE = 1000;
     stable let MAX_TRANSACTIONS_PER_REQUEST = 5000;
