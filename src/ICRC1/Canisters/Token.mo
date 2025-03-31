@@ -80,7 +80,6 @@ shared ({ caller = _owner }) actor class Token(
         ICRC1.get_transactions(token, req);
     };
 
-    // ICRC1 标准之外的附加函数
     public shared func get_transaction(i : ICRC1.TxIndex) : async ?ICRC1.Transaction {
         await ICRC1.get_transaction(token, i);
     };
