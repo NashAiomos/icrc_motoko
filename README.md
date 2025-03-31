@@ -56,7 +56,7 @@ type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestam
 
 项目实现了 ICRC-1 代币标准，采用 Motoko 语言开发，主要逻辑在 ICRC1 文件夹中。
 
-由两个 canister 组成 Token 和 Archive ：
+由两个 canister 组成， Token 和 Archive ：
 
 * Token Canister
 
@@ -64,7 +64,7 @@ type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestam
 
 * Archive Canister
 
-  专门用于存储和查询存档的交易记录，用以扩展主账本存储容量。由 Archive.mo 定义。
+  专门用于存储和查询存档的交易记录，用以扩展主账本存储容量。支持自动扩容，每个 canister 储存 375GiB 交易。由 Archive.mo 定义。
 
 还有其他辅助模块，账户编码/解码、交易处理、各类类型定义和工具函数。
 
