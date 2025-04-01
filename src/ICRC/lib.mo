@@ -20,7 +20,7 @@ import Utils "Utils";
 import Transfer "Transfer";
 import Archive "Canisters/Archive";
 
-/// ICRC1 类，包含在互联网计算机上创建 ICRC1 代币的所有函数
+/// ICRC-1 类，包含在互联网计算机上创建 ICRC-1 代币的所有函数
 module {
     let { SB } = Utils;
 
@@ -31,6 +31,7 @@ module {
     public type Transaction = T.Transaction;
     public type Balance = T.Balance;
     public type TransferArgs = T.TransferArgs;
+    public type TransferFromArgs = T.TransferFromArgs;
     public type Mint = T.Mint;
     public type BurnArgs = T.BurnArgs;
     public type TransactionRequest = T.TransactionRequest;
@@ -400,7 +401,7 @@ module {
         };
     };
 
-    // 将交易从 ICRC1 容器转移到归档容器，并返回一个指示数据传输是否成功的布尔值
+    // 将交易从 Token 容器转移到存档容器，并返回一个指示数据传输是否成功的布尔值
     func append_transactions(token : T.TokenData) : async () {
         let { archive; transactions } = token;
 

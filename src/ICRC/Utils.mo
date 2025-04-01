@@ -34,8 +34,8 @@ module {
     };
 
     public let default_standard : T.SupportedStandard = {
-        name = "ICRC-1";
-        url = "https://github.com/dfinity/ICRC-1";
+        name = "ICRC-2";
+        url = "https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-2";
     };
 
     // 创建具有默认支持标准的 StableBuffer 并返回它。

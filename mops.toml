@@ -1,8 +1,8 @@
 [package]
-name = "icrc1"
+name = "icrc"
 version = "0.1.0"
-description = "ICRC1 Motoko Implementation"
-repository = "https://github.com/NashAiomos/icrc1_motoko"
+description = "ICRC Motoko Implementation"
+repository = "https://github.com/NashAiomos/icrc_motoko"
 
 [dependencies]
 base = "0.13.0"

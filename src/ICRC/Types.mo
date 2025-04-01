@@ -221,7 +221,7 @@ module {
         initial_balances : [(Account, Balance)];
         min_burn_amount : Balance;
 
-        /// 如果未提供，则默认为调用者的可选值
+        /// 如果没提供，则默认为调用者的可选值
         minting_account : ?Account;
 
         advanced_settings: ?AdvancedSettings;

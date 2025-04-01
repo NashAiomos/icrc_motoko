@@ -2,9 +2,9 @@
     "version": 1,
     "dfx": "0.22.0",
     "canisters": {
-        "icrc1": {
+        "icrc": {
             "type": "motoko",
-            "main": "src/ICRC1/Canisters/Token.mo"
+            "main": "src/ICRC/Canisters/Token.mo"
         }
     },
     "defaults": {

@@ -1,6 +1,5 @@
-# ICRC-1 Motoko Implementation
-This repo contains the implementation of the 
-[ICRC-1](https://github.com/dfinity/ICRC-1) token standard. 
+# ICRC Motoko Implementation
+This repo contains the implementation of the ICRC token standard. 
 
 ## Local Test Deployment
 First, we have to have nodejs, npm, dfx and [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install).
@@ -17,12 +16,12 @@ dfx extension install mops
 
 运行项目：(替换其中的参数)
 ```motoko
-    git clone https://github.com/NashAiomos/icrc1_motoko
-    cd icrc1_motoko
+    git clone https://github.com/NashAiomos/icrc_motoko
+    cd icrc_motoko
     mops install
     dfx start --background --clean
 
-    dfx deploy icrc1 --argument '( record {                    
+    dfx deploy icrc --argument '( record {                    
         name = "aaa";
         symbol = "aaa";
         decimals = 8;
@@ -38,8 +37,9 @@ dfx extension install mops
             };
         };
         min_burn_amount = 10_000;
-        minting_account = record {
+        minting_account = opt record {
             owner = principal "hbvut-2ui4m-jkj3c-ey43g-lbtbp-abta2-w7sgj-q4lqx-s6mrb-uqqd4-mqe";
+            subaccount = null;
         };
         advanced_settings = null;
     })'
@@ -54,13 +54,13 @@ type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestam
 
 ## 项目整体架构
 
-项目实现了 ICRC-1 代币标准，采用 Motoko 语言开发，主要逻辑在 ICRC1 文件夹中。
+项目实现了 ICRC-2 代币标准，采用 Motoko 语言开发，主要逻辑在 src 文件夹中。
 
 由两个 canister 组成， Token 和 Archive ：
 
 * Token Canister
 
-  提供 ICRC-1 标准的所有核心代币功能和状态管理，并集成了交易存档逻辑。由 Token.mo 定义。
+  提供 ICRC-2 标准的所有核心代币功能和状态管理，并集成了交易存档逻辑。由 Token.mo 定义。
 
 * Archive Canister
 
@@ -73,7 +73,7 @@ type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestam
 ## Token Canister
 实现文件： Token.mo
 
-提供 ICRC-1 代币标准接口，包括查询代币名称、符号、小数位、余额、总供应量、手续费、支持标准等。
+提供 ICRC-2 代币标准接口，包括查询代币名称、符号、小数位、余额、总供应量、手续费、支持标准等。
 实现代币的状态管理、转账、铸币、销币等业务逻辑。
 
 集成存档逻辑：
@@ -132,7 +132,7 @@ deposit_cycles()：接收并存入周期（Cycles）。
 ## 辅助模块
 类型定义（Types）
 
-文件：src/ICRC1/Types.mo
+文件：src/ICRC/Types.mo
 
 定义了各种类型，比如 Account、TransferArgs、Transaction、TransferResult、以及 Token 的整体数据结构 TokenData。这些类型构成整个系统的基本数据结构和接口协议。
 
@@ -140,7 +140,7 @@ deposit_cycles()：接收并存入周期（Cycles）。
 
 账户操作（Account）
 
-文件：src/ICRC1/Account.mo
+文件：src/ICRC/Account.mo
 
 提供了 ICRC-1 账户的编码与解码功能，依据 ICRC-1 标准实现账户地址的文本表示和内部二进制格式的转换。
 
@@ -148,7 +148,7 @@ deposit_cycles()：接收并存入周期（Cycles）。
 
 交易处理（Transfer）
 
-文件：src/ICRC1/Transfer.mo
+文件：src/ICRC/Transfer.mo
 
 实现了交易请求的验证逻辑，包括检查备注长度、手续费、账户余额、创建时间是否过期或未来、以及重复交易检查等。该模块返回验证结果，并辅助决定交易是转账、铸币或销币。
 
@@ -156,7 +156,7 @@ deposit_cycles()：接收并存入周期（Cycles）。
 
 工具函数（Utils）
 
-文件：src/ICRC1/Utils.mo
+文件：src/ICRC/Utils.mo
 
 包含了元数据的初始化、支持标准的生成、账户的默认子账户、哈希函数、以及从交易请求到最终交易的格式转换等功能。也是 lib.mo 调用的工具模块。
 
@@ -164,9 +164,9 @@ deposit_cycles()：接收并存入周期（Cycles）。
 
 主逻辑（lib）
 
-文件：src/ICRC1/lib.mo
+文件：src/ICRC/lib.mo
 
-将各个部分组合在一起，提供了对外 ICRC-1 Token 的所有接口。它调用 Utils、Transfer、Account 等模块，实现了代币的初始化、状态管理、交易操作、存档逻辑以及余额查询等功能。
+将各个部分组合在一起，提供了对外 ICRC-2 Token 的所有接口。它调用 Utils、Transfer、Account 等模块，实现了代币的初始化、状态管理、交易操作、存档逻辑以及余额查询等功能。
 
 ## 测试模块
 测试代码分布在 ICRC1 下，主要包括：
