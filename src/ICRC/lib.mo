@@ -184,7 +184,7 @@ module {
         token._minted_tokens;
     };
 
-    /// 返回已销毁代币的总供应量
+    /// 返回已销毁代币的数量
     public func burned_supply(token : T.TokenData) : T.Balance {
         token._burned_tokens;
     };
