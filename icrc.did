@@ -67,30 +67,6 @@ type InitArgs = record {
     };
 };
 
-service : (InitArgs) -> {
-    icrc1_name : () -> (text) query;
-    icrc1_symbol : () -> (text) query;
-    icrc1_decimals : () -> (nat8) query;
-    icrc1_metadata : () -> (vec record { text; Value }) query;
-    icrc1_total_supply : () -> (Tokens) query;
-    icrc1_fee : () -> (Tokens) query;
-    icrc1_minting_account : () -> (opt Account) query;
-    icrc1_balance_of : (Account) -> (Tokens) query;
-    icrc1_transfer : (TransferArg) -> (TransferResult);
-    icrc1_supported_standards : () -> (vec record { name : text; url : text }) query;
-    
-    icrc2_approve : (Account, Tokens) -> ();
-    icrc2_transfer_from : (TransferFromArgs) -> (TransferResult);
-
-    // Burn 是由 token 持有者主动调用 burn 方法来销毁自己账户中的 token
-    // 只有当用户主动发起销毁请求，并符合相关条件后，合约才会执行销毁操作，从而降低总供应量
-    // 所以不暴露接口，并应该在函数里添加检查，只有 vUSD canister 才能调用
-    // Mint 也是一样
-    get_transactions : (GetTransactionsRequest) -> (GetTransactionsResponse) query;
-    get_transaction : (TxIndex) -> (opt Transaction);
-    deposit_cycles : () -> ();
-}
-
 type TransferArgs = {
     from_subaccount : ?Subaccount;
     to : Account;
@@ -109,3 +85,30 @@ type TransferFromArgs = {
     memo : ?Blob;
     created_at_time : ?Nat64;
 };
+
+type AllowanceArgs = record {
+    owner : Account;
+    spender : Account;
+};
+
+service : (InitArgs) -> {
+    icrc1_name : () -> (text) query;
+    icrc1_symbol : () -> (text) query;
+    icrc1_decimals : () -> (nat8) query;
+    icrc1_metadata : () -> (vec record { text; Value }) query;
+    icrc1_total_supply : () -> (Tokens) query;
+    icrc1_fee : () -> (Tokens) query;
+    icrc1_minting_account : () -> (opt Account) query;
+    icrc1_balance_of : (Account) -> (Tokens) query;
+    icrc1_transfer : (TransferArg) -> (TransferResult);
+    icrc1_supported_standards : () -> (vec record { name : text; url : text }) query;
+    
+    icrc2_approve : (Account, Tokens) -> ();
+    icrc2_transfer_from : (TransferFromArgs) -> (TransferResult);
+    icrc2_allowance : (AllowanceArgs) -> (record { allowance : nat; expires_at : opt nat64 }) query;
+
+    get_transactions : (GetTransactionsRequest) -> (GetTransactionsResponse) query;
+    get_transaction : (TxIndex) -> (opt Transaction);
+    deposit_cycles : () -> ();
+}
+

@@ -438,7 +438,7 @@ module {
         );
     };
 
-    /// 代表转账函数
+    /// ICRC-2 代表转账函数
     public func transfer_from(token : T.TokenData, args : T.TransferFromArgs, caller : Principal) : async T.TransferResult {
         let owner_encoded = Account.encode(args.from);
         let spender_account : T.Account = { owner = caller; subaccount = null };
@@ -489,6 +489,18 @@ module {
         SB.add(token.transactions, tx);
         await update_canister(token);
         #Ok(tx.index);
+    };
+
+    /// ICRC-2 授权查询函数，根据授权参数返回对应的授权额度
+    public func allowance(token : T.TokenData, args : { owner : T.Account; spender : T.Account }) : async { allowance : T.Balance; expires_at : ?Nat64 } {
+        let owner_encoded = Account.encode(args.owner);
+        let spender_encoded = Account.encode(args.spender);
+        let key = Utils.encode_allowance(owner_encoded, spender_encoded);
+        let current = StableTrieMap.get(token.allowances, Blob.equal, Blob.hash, key);
+        switch (current) {
+            case (?allowance) { return { allowance = allowance; expires_at = null }; }
+            case (_) { return { allowance = 0; expires_at = null }; }
+        };
     };
 
 };
