@@ -80,7 +80,6 @@ module {
         );
     };
 
-    /// 实现 ICRC1 账户的文本表示形式 [编码标准](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#encoding)
     public func encode({ owner; subaccount } : T.Account) : T.EncodedAccount {
         let owner_blob = Principal.toBlob(owner);
 
@@ -101,7 +100,7 @@ module {
         };
     };
 
-    /// 实现 ICRC1 账户的文本表示形式 [解码标准](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#decoding)
+    /// 实现 ICRC-1 账户的文本表示形式 [解码标准](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#decoding)
     public func decode(encoded : T.EncodedAccount) : ?T.Account {
         let bytes = Blob.toArray(encoded);
         var size = bytes.size();

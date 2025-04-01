@@ -88,3 +88,13 @@ type TransferArgs = {
     memo : ?Blob;
     created_at_time : ?Nat64
 }
+
+type TransferFromArgs = {
+    spender_subaccount : ?Subaccount;
+    from : Account;
+    to : Account;
+    amount : Balance;
+    fee : ?Balance;
+    memo : ?Blob;
+    created_at_time : ?Nat64;
+};

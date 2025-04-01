@@ -313,4 +313,9 @@ module {
             );
         };
     };
+
+    public func encode_allowance(owner : T.EncodedAccount, spender : T.EncodedAccount) : T.EncodedAccount {
+        Blob.fromArray(Array.append(Blob.toArray(owner), Blob.toArray(spender)))
+    };
+    
 };

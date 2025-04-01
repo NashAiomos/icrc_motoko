@@ -139,6 +139,7 @@ module {
                 var canister = actor ("aaaaa-aa");
                 var stored_txs = 0;
             };
+            allowances = StableTrieMap.new();
         };
     };
 
@@ -419,6 +420,74 @@ module {
             };
             case (#err(_)) {};
         };
+    };
+
+    /// ICRC-2 账户授权函数
+    public func approve(token : T.TokenData, spender : T.Account, amount : T.Balance, caller : Principal) : () {
+        let owner_account : T.Account = { owner = caller; subaccount = null };
+        let owner_encoded = Account.encode(owner_account);
+        let spender_encoded = Account.encode(spender);
+        let key = Utils.encode_allowance(owner_encoded, spender_encoded);
+        StableTrieMap.put(
+            token.allowances,
+            Blob.equal,
+            Blob.hash,
+            key,
+            amount,
+        );
+    };
+
+    /// 代表转账函数
+    public func transfer_from(token : T.TokenData, args : T.TransferFromArgs, caller : Principal) : async T.TransferResult {
+        let owner_encoded = Account.encode(args.from);
+        let spender_account : T.Account = { owner = caller; subaccount = null };
+        let spender_encoded = Account.encode(spender_account);
+        let key = Utils.encode_allowance(owner_encoded, spender_encoded);
+        let current_allowance = StableTrieMap.get(
+            token.allowances,
+            Blob.equal,
+            Blob.hash,
+            key,
+        );
+        switch (current_allowance) {
+            case (?allowed) {
+                if (args.amount > allowed) {
+                    return #Err(#InsufficientFunds { balance = allowed });
+                };
+            };
+            case (_) {
+                return #Err(#InsufficientFunds { balance = 0 });
+            };
+        };
+        let new_allowance = switch (current_allowance) {
+            case (?allowed) { allowed - args.amount };
+            case (_) 0;
+        };
+        StableTrieMap.put(
+            token.allowances,
+            Blob.equal,
+            Blob.hash,
+            key,
+            new_allowance,
+        );
+        let transfer_args : T.TransferArgs = {
+            from_subaccount = args.from.subaccount;
+            to = args.to;
+            amount = args.amount;
+            fee = args.fee;
+            memo = args.memo;
+            created_at_time = args.created_at_time;
+        };
+        let tx_req = Utils.create_transfer_req(transfer_args, args.from.owner, #transfer);
+        Utils.transfer_balance(token, tx_req);
+        if (args.fee != null and token._fee > 0) {
+            Utils.burn_balance(token, tx_req.encoded.from, token._fee);
+        };
+        let index = SB.size(token.transactions) + token.archive.stored_txs;
+        let tx = Utils.req_to_tx(tx_req, index);
+        SB.add(token.transactions, tx);
+        await update_canister(token);
+        #Ok(tx.index);
     };
 
 };

@@ -86,6 +86,16 @@ module {
         created_at_time : ?Nat64;
     };
 
+    public type TransferFromArgs = {
+        spender_subaccount : ?Subaccount;
+        from : Account;
+        to : Account;
+        amount : Balance;
+        fee : ?Balance;
+        memo : ?Blob;
+        created_at_time : ?Nat64;
+    };
+
     /// 交易请求的内部表示
     public type TransactionRequest = {
         kind : TxKind;
@@ -287,6 +297,9 @@ module {
 
         /// 存储 archive canister 详细信息及其中存储的交易数量的记录
         archive : ArchiveData;
+
+        /// 存储授权额度映射，键为由拥有者与被授权方拼接得到的 EncodedAccount
+        allowances : StableTrieMap<EncodedAccount, Balance>;
     };
 
     // Rosetta API
@@ -333,5 +346,4 @@ module {
 
     /// ICRC token 及 Rosetta canister 的接口
     public type FullInterface = TokenInterface and RosettaInterface;
-
 };

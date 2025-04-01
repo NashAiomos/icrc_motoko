@@ -9,6 +9,7 @@ import SB "mo:StableBuffer/StableBuffer";
 
 import ICRC1 "..";
 import Archive "Archive";
+import Types "../Types";
 
 shared ({ caller = _owner }) actor class Token(
     init_args : ICRC1.TokenInitArgs,
@@ -26,7 +27,7 @@ shared ({ caller = _owner }) actor class Token(
 
     stable let token = ICRC1.init(icrc1_args);
 
-    /// ICRC1 代币标准的函数
+    /// ICRC-1 代币标准函数
     public shared query func icrc1_name() : async Text {
         ICRC1.name(token);
     };
@@ -75,7 +76,16 @@ shared ({ caller = _owner }) actor class Token(
         await ICRC1.burn(token, args, caller);
     };
 
-    // 用于集成 Rosetta 标准的函数
+    // ICRC-2 代币标准函数
+    public shared ({ caller }) func approve(spender : ICRC1.Account, amount : ICRC1.Balance) : async () {
+        ICRC1.approve(token, spender, amount, caller);
+    };
+
+    public shared ({ caller }) func transfer_from(args : ICRC1.TransferFromArgs) : async ICRC1.TransferResult {
+        await ICRC1.transfer_from(token, args, caller);
+    };
+
+    // 用于集成 Rosetta 标准函数
     public shared query func get_transactions(req : ICRC1.GetTransactionsRequest) : async ICRC1.GetTransactionsResponse {
         ICRC1.get_transactions(token, req);
     };
