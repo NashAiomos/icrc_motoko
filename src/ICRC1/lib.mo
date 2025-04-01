@@ -102,7 +102,7 @@ module {
 
             if (not Account.validate(account)) {
                 Debug.trap(
-                    "无效账户：'initial_balances' 中索引为 " # debug_show i # " 的账户无效",
+                    "Invalid Account: Account at index " # debug_show i # " is invalid in 'initial_balances'",
                 );
             };
 
