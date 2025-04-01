@@ -83,9 +83,9 @@ shared ({ caller = _owner }) actor class Token(
     public shared ({ caller }) func icrc2_transfer_from(args : ICRC.TransferFromArgs) : async ICRC.TransferResult {
         await ICRC.transfer_from(token, args, caller);
     };
-
+    
     public shared query func icrc2_allowance(args : ICRC.AllowanceArgs) : async { allowance : ICRC.Balance; expires_at : ?Nat64 } {
-        await ICRC.allowance(token, args);
+        ICRC.allowance(token, args);
     };
 
     // 用于集成 Rosetta 标准函数
