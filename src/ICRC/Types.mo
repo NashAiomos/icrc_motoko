@@ -86,6 +86,7 @@ module {
         created_at_time : ?Nat64;
     };
 
+    /// ICRC-2 转账操作参数
     public type TransferFromArgs = {
         spender_subaccount : ?Subaccount;
         from : Account;
@@ -94,6 +95,12 @@ module {
         fee : ?Balance;
         memo : ?Blob;
         created_at_time : ?Nat64;
+    };
+
+    /// ICRC-2 授权额度参数
+    public type AllowanceArgs = {
+        owner : Account;
+        spender : Account;
     };
 
     /// 交易请求的内部表示

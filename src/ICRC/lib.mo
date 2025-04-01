@@ -498,9 +498,9 @@ module {
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         let current = StableTrieMap.get(token.allowances, Blob.equal, Blob.hash, key);
         switch (current) {
-            case (?allowance) { return { allowance = allowance; expires_at = null }; }
-            case (_) { return { allowance = 0; expires_at = null }; }
-        };
+            case (?allowance) { { allowance = allowance; expires_at = null } };
+            case (_) { { allowance = 0; expires_at = null } }
+        }
     };
 
 };
