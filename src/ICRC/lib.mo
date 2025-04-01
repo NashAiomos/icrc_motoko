@@ -32,6 +32,7 @@ module {
     public type Balance = T.Balance;
     public type TransferArgs = T.TransferArgs;
     public type TransferFromArgs = T.TransferFromArgs;
+    public type AllowanceArgs = T.AllowanceArgs;
     public type Mint = T.Mint;
     public type BurnArgs = T.BurnArgs;
     public type TransactionRequest = T.TransactionRequest;
