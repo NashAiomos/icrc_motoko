@@ -101,11 +101,15 @@ icrc1_balance_of(account)：查询指定账户的余额。
 
 icrc1_transfer(args)：执行转账操作（内部根据发送者/接收者判断是普通转账、铸币或销币）。
 
+**icrc2_approve()**：授权一个账户可以代表授权者进行代币转移操作。
+
+**icrc2_transfer_from()**：允许已获得授权的账户执行代币转移。
+
 mint(args) 和 burn(args)：辅助函数分别用于铸币和销币操作。
 
 get_transaction(tx_index) 与 get_transactions(req)：提供对单笔或批量交易的查询，当交易数量超过上限时转而查询 Archive Canister。
 
-deposit_cycles()：允许用户向 canister 存入周期（cycles）。
+deposit_cycles()：允许用户向 canister 存入 Cycles 。
 
 ## Archive Canister
 实现文件： Archive.mo
@@ -126,7 +130,7 @@ get_transactions(req)：按请求范围查询存档中的交易记录，支持�
 
 remaining_capacity()：返回存档 canister 在存满之前剩余的存储容量。
 
-deposit_cycles()：接收并存入周期（Cycles）。
+deposit_cycles()：接收并存入 Cycles 。
 
 
 ## 辅助模块
