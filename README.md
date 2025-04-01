@@ -105,6 +105,8 @@ icrc1_transfer(args)：执行转账操作（内部根据发送者/接收者判�
 
 **icrc2_transfer_from()**：允许已获得授权的账户执行代币转移。
 
+**icrc2_allowance()**：查询并返回某个账户（owner）已经授权给另一个账户（spender）可转移的代币数量。
+
 mint(args) 和 burn(args)：辅助函数分别用于铸币和销币操作。
 
 get_transaction(tx_index) 与 get_transactions(req)：提供对单笔或批量交易的查询，当交易数量超过上限时转而查询 Archive Canister。
