@@ -1,4 +1,4 @@
-# ICRC Motoko Implementation
+# ICRC-1 & ICRC-2 Motoko Implementation
 This repo contains the implementation of the ICRC token standard. 
 
 ## Local Test Deployment

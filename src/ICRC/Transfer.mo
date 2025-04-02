@@ -214,7 +214,7 @@ module {
                     tx_req.encoded.from,
                 );
 
-                if (tx_req.amount > balance + token._fee) {
+                if (balance < tx_req.amount + token._fee) {
                     return #err(#InsufficientFunds { balance = balance });
                 };
             };
