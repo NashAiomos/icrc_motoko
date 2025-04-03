@@ -10,6 +10,7 @@ import Nat8 "mo:base/Nat8";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import EC "mo:base/ExperimentalCycles";
+import HashMap "mo:base/HashMap";
 
 import Itertools "mo:itertools/Iter";
 import StableTrieMap "mo:StableTrieMap";
@@ -19,6 +20,7 @@ import T "Types";
 import Utils "Utils";
 import Transfer "Transfer";
 import Archive "Canisters/Archive";
+import Freeze "Freeze";
 
 /// ICRC-1 类，包含在互联网计算机上创建 ICRC-1 代币的所有函数
 module {
@@ -142,6 +144,8 @@ module {
                 var stored_txs = 0;
             };
             allowances = StableTrieMap.new();
+            var frozen_accounts = HashMap.HashMap<Principal, Bool>(10, Principal.equal, Principal.hash);
+            var frozen_entries = [];
         };
     };
 
@@ -234,6 +238,11 @@ module {
         let from = {
             owner = caller;
             subaccount = args.from_subaccount;
+        };
+
+        // 同步检查冻结状态
+        if (Freeze.is_frozen(token, from.owner)) {
+            return #Err(#FrozenAccount);
         };
 
         let tx_kind = if (from == token.minting_account) {

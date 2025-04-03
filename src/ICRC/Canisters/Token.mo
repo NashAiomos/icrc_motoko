@@ -9,6 +9,8 @@ import SB "mo:StableBuffer/StableBuffer";
 
 import ICRC "..";
 import Archive "Archive";
+import HashMap "mo:base/HashMap";
+import Principal "mo:base/Principal";
 
 shared ({ caller = _owner }) actor class Token(
     init_args : ICRC.TokenInitArgs,
@@ -102,5 +104,25 @@ shared ({ caller = _owner }) actor class Token(
         let amount = ExperimentalCycles.available();
         let accepted = ExperimentalCycles.accept(amount);
         assert (accepted == amount);
+    };
+
+    // 为了在升级时保持 HashMap 的数据不丢失
+    // 在升级时将 HashMap 的数据拆分出来储存到稳定存储
+    // 升级后再将数据重新加载到 HashMap 中
+    system func preupgrade() {
+        // 导出冻结账户列表到稳定存储
+        token.frozen_entries := Iter.toArray(token.frozen_accounts.entries());
+    };
+
+    system func postupgrade() {
+        // 重建冻结账户 HashMap
+        token.frozen_accounts := HashMap.fromIter<Principal, Bool>(
+            token.frozen_entries.vals(),
+            10,
+            Principal.equal,
+            Principal.hash
+        );
+        // 清空备份数据
+        token.frozen_entries := [];
     };
 };
