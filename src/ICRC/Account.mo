@@ -100,52 +100,71 @@ module {
         };
     };
 
-    /// 实现 ICRC-1 账户的文本表示形式解码标准
+    /// ICRC-1 账户的文本表示形式解码标准
     public func decode(encoded : T.EncodedAccount) : ?T.Account {
         let bytes = Blob.toArray(encoded);
-        var size = bytes.size();
+        let size = bytes.size();
 
-        if (bytes[size - 1] == 0x7f) {
-            size -= 1;
+        // 检查空输入
+        if (size == 0) {
+            return null;
+        };
 
-            let subaccount_size = Nat8.toNat(bytes[size - 1]);
+        // 检查子账户编码（末尾为 0x7f）
+        if (size >= 2 and bytes[size - 1] == 0x7f) {
+            let subaccount_size = Nat8.toNat(bytes[size - 2]);
 
+            // 验证子账户大小（1-32 字节）
             if (subaccount_size == 0 or subaccount_size > 32) {
                 return null;
             };
 
-            size -= 1;
-            let split_index = (size - subaccount_size) : Nat;
-
-            if (bytes[split_index] == 0) {
+            // 计算 principal 和 subaccount 的分割点
+            let split_index = size - 2 - subaccount_size;
+            if (split_index < 0 or split_index >= size) {
                 return null;
             };
 
+            // 子账户不能以零字节开头
+            if (subaccount_size > 0 and bytes[split_index] == 0) {
+                return null;
+            };
+
+            // 确保 principal 非空
+            if (split_index == 0) {
+                return null;
+            };
+
+            // 提取并验证 principal
             let principal = Principal.fromBlob(
                 Blob.fromArray(
                     ArrayModule.slice(bytes, 0, split_index),
                 ),
             );
+            if (Principal.isAnonymous(principal) or Principal.toBlob(principal).size() > 29) {
+                return null;
+            };
 
+            // 补齐子账户至 32 字节
             let prefix_zeroes = Itertools.take(
                 Iter.make(0 : Nat8),
                 (32 - subaccount_size) : Nat,
             );
-
-            let encoded_subaccount = Itertools.fromArraySlice(bytes, split_index, size);
-
+            let encoded_subaccount = Itertools.fromArraySlice(bytes, split_index, size - 2);
             let subaccount = Blob.fromArray(
                 Iter.toArray(
                     Itertools.chain(prefix_zeroes, encoded_subaccount),
                 ),
             );
 
-            ?{ owner = principal; subaccount = ?subaccount };
+            return ?{ owner = principal; subaccount = ?subaccount };
         } else {
-            ?{
-                owner = Principal.fromBlob(encoded);
-                subaccount = null;
+            // 无子账户，直接解析 principal
+            let principal = Principal.fromBlob(encoded);
+            if (Principal.isAnonymous(principal) or Principal.toBlob(principal).size() > 29) {
+                return null;
             };
+            return ?{ owner = principal; subaccount = null };
         };
     };
 

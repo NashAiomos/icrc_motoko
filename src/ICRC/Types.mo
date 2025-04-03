@@ -2,7 +2,6 @@ import Deque "mo:base/Deque";
 import List "mo:base/List";
 import Time "mo:base/Time";
 import Result "mo:base/Result";
-import HashMap "mo:base/HashMap";
 
 import STMap "mo:StableTrieMap";
 import StableBuffer "mo:StableBuffer/StableBuffer";
@@ -310,10 +309,8 @@ module {
         /// 存储授权额度映射，键为由拥有者与被授权方拼接得到的 EncodedAccount
         allowances : StableTrieMap<EncodedAccount, Balance>;
 
-        /// 使用 HashMap 存储冻结账户列表
-        var frozen_accounts : HashMap.HashMap<Principal, Bool>;
-        /// 存储备份的冻结账户列表(用于升级)
-        var frozen_entries : [(Principal, Bool)];
+        /// 使用 StableTrieMap 存储冻结账户列表，确保数据持久性
+        frozen_accounts : StableTrieMap<Principal, Bool>;
     };
 
     // Rosetta API

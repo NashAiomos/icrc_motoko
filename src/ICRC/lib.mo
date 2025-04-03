@@ -10,7 +10,6 @@ import Nat8 "mo:base/Nat8";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import EC "mo:base/ExperimentalCycles";
-import HashMap "mo:base/HashMap";
 
 import Itertools "mo:itertools/Iter";
 import StableTrieMap "mo:StableTrieMap";
@@ -144,8 +143,7 @@ module {
                 var stored_txs = 0;
             };
             allowances = StableTrieMap.new();
-            var frozen_accounts = HashMap.HashMap<Principal, Bool>(10, Principal.equal, Principal.hash);
-            var frozen_entries = [];
+            frozen_accounts = StableTrieMap.new(); // 初始化冻结账户存储
         };
     };
 
@@ -240,7 +238,7 @@ module {
             subaccount = args.from_subaccount;
         };
 
-        // 同步检查冻结状态
+        // 检查冻结状态
         if (Freeze.is_frozen(token, from.owner)) {
             return #Err(#FrozenAccount);
         };
