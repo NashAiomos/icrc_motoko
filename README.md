@@ -8,6 +8,8 @@ The `ICRC-2` branch is the standard implementation of ICRC-2.
 
 The `ICRC-1` branch contains the standard implementation of ICRC-1.
 
+<br>
+
 ## Local Test Deployment
 
 To get started, ensure you have **Node.js**, **npm**, **dfx**, and **[mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install)** installed on your system.
@@ -55,10 +57,14 @@ dfx deploy icrc --argument '( record {
 ```motoko
 advanced_settings:
 
-type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestamp; permitted_drift : Timestamp }
+type AdvancedSettings = {
+    burned_tokens : Balance;
+    transaction_window : Timestamp;
+    permitted_drift : Timestamp
+}
 ```
 
----
+<br>
 
 ## Project Architecture
 
@@ -74,7 +80,7 @@ The project implements the **ICRC-2 token standard** using the **Motoko** progra
 
 Additionally, the project includes auxiliary modules for account encoding/decoding, transaction processing, type definitions, and utility functions. Test code is located in the `tests` folder and requires separate deployment.
 
----
+<br>
 
 ## Token Canister
 
@@ -103,7 +109,7 @@ The Token Canister provides the **ICRC-2 token standard interfaces**, including 
 - **`get_transaction(tx_index)`** and **`get_transactions(req)`**: Provide queries for single or batch transactions; redirects to the Archive Canister when the transaction limit is exceeded.
 - **`deposit_cycles()`**: Allows users to deposit Cycles into the canister.
 
----
+<br>
 
 ## Archive Canister
 
@@ -122,7 +128,7 @@ The Archive Canister provides transaction archiving storage for the Token Canist
 - **`remaining_capacity()`**: Returns the remaining storage capacity before the archive canister is full.
 - **`deposit_cycles()`**: Receives and deposits Cycles.
 
----
+<br>
 
 ## Auxiliary Modules
 
@@ -145,28 +151,3 @@ The Archive Canister provides transaction archiving storage for the Token Canist
 ### Main Logic (lib)
 - **File**: `src/ICRC/lib.mo`
 - **Purpose**: Combines various modules to provide all external ICRC-2 Token interfaces. It calls `Utils`, `Transfer`, and `Account` to handle token initialization, state management, transaction operations, archiving logic, and balance queries.
-
----
-
-## Test Modules
-
-Test code is located in the `ICRC1` folder and includes:
-
-### ICRC1.ActorTest.mo
-- **Purpose**: Tests token initialization, querying basic interfaces (name, symbol, decimals, fee), and transaction methods (mint, burn, transfer), verifying account balance updates and transaction archiving.
-
-### Account.Test.mo
-- **Purpose**: Tests account encoding/decoding functions to ensure accurate conversion between text representation and internal binary format.
-
-### Archive.ActorTest.mo
-- **Purpose**: Tests the Archive Canister’s archiving functions, including appending transactions, batch querying, and single transaction queries.
-
-### ActorTest.mo
-- **Purpose**: The test entry file, responsible for running the above test modules sequentially and outputting the overall test results.
-
-### Test Utilities (ActorSpec)
-- **File**: `tests/utils/ActorSpec.mo`
-- **Purpose**: Provides simple test descriptions, assertions, and group running functions to assist in writing and executing test cases.
-
-### Makefile
-- **Purpose**: Provides commands for testing, documentation generation, and running actor-tests, facilitating local builds and test execution.
