@@ -14,14 +14,14 @@ The `ICRC-1` branch contains the standard implementation of ICRC-1.
 
 ## Local Test Deployment
 
-To get started, ensure you have **Node.js**, **npm**, **dfx**, and **[mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install)** installed on your system.
+To get started, ensure you have **Node.js**, **npm**, **dfx**, and **mops** installed on your system.
 
 ### Install [dfx](https://internetcomputer.org/docs/building-apps/getting-started/install) (Linux or macOS):
 ```sh
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
-### Install mops:
+### Install [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install):
 `dfx extension install mops` or `npm i -g ic-mops`
 
 ### Run the Project (replace parameters as needed):
@@ -56,9 +56,7 @@ dfx deploy icrc --argument '( record {
 ```
 
 ### Additional Configuration:
-
 advanced_settings:
-
 ```sh
 type AdvancedSettings = {
     burned_tokens : Balance;

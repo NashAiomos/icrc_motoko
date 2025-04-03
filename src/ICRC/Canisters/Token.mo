@@ -103,4 +103,11 @@ shared ({ caller = _owner }) actor class Token(
         let accepted = ExperimentalCycles.accept(amount);
         assert (accepted == amount);
     };
+
+    // freeze
+    public shared ({ caller }) func freeze() : async () {
+        ICRC.freeze(token, caller);
+    };
+
+    
 };
