@@ -10,7 +10,7 @@ import SB "mo:StableBuffer/StableBuffer";
 import ICRC "..";
 import Archive "Archive";
 import Principal "mo:base/Principal";
-import Freeze "../Freeze.mo";
+import Freeze "../Freeze";
 
 shared ({ caller = _owner }) actor class Token(
     init_args : ICRC.TokenInitArgs,
