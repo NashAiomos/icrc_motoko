@@ -433,6 +433,9 @@ module {
 
     /// ICRC-2 账户授权函数
     public func approve(token : T.TokenData, spender : T.Account, amount : T.Balance, caller : Principal) : () {
+        if (Freeze.is_frozen(token, caller)) {
+            Debug.trap("Frozen account cannot approve transfers");
+        };
         let owner_account : T.Account = { owner = caller; subaccount = null };
         let owner_encoded = Account.encode(owner_account);
         let spender_encoded = Account.encode(spender);
@@ -448,6 +451,9 @@ module {
 
     /// ICRC-2 代表转账函数
     public func transfer_from(token : T.TokenData, args : T.TransferFromArgs, caller : Principal) : async T.TransferResult {
+        if (Freeze.is_frozen(token, args.from.owner)) {
+            return #Err(#FrozenAccount);
+        };
         let owner_encoded = Account.encode(args.from);
         let spender_account : T.Account = { owner = caller; subaccount = null };
         let spender_encoded = Account.encode(spender_account);
