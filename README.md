@@ -1,8 +1,10 @@
 # ICRC-1 & ICRC-2 Motoko Implementation
 
+English | [Français](./docs/README.fr.md) | [简体中文](./docs/README.zh-CN.md) | [日本語](./docs/README.jp.md) | [español](./docs/README.es.md) 
+
 This repository contains the implementation of the ICRC token standard.
 
-The `main` branch is the primary branch that includes all features.
+The `main` branch is the primary branch that includes all features and adds the ability to freeze specific accounts on top of ICRC-2.
 
 The `ICRC-2` branch is the standard implementation of ICRC-2.
 
