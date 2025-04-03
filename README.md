@@ -18,9 +18,7 @@ sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
 ### Install mops:
-```sh
-dfx extension install mops
-```
+`dfx extension install mops` or `npm i -g ic-mops`
 
 ### Run the Project (replace parameters as needed):
 ```sh
