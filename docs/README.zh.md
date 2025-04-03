@@ -12,7 +12,7 @@
 首先我们得有 nodejs, npm, dfx and [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install).
 
 安装[dfx](https://internetcomputer.org/docs/building-apps/getting-started/install)：（Linux 或 macOS）
-```
+```sh
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
@@ -20,7 +20,7 @@ sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 `dfx extension install mops` 或 `npm i -g ic-mops`
 
 运行项目：(替换其中的参数)
-```motoko
+```sh
     git clone https://github.com/NashAiomos/icrc_motoko
     cd icrc_motoko
     mops install
@@ -51,10 +51,15 @@ sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
 额外的配置：
-```
+
 advanced_settings:
 
-type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestamp; permitted_drift : Timestamp }
+```sh
+type AdvancedSettings = { 
+    burned_tokens : Balance;
+    transaction_window : Timestamp;
+    permitted_drift : Timestamp;
+}
 ```
 
 ## 项目整体架构

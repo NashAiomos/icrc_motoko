@@ -1,6 +1,6 @@
 # ICRC-1 & ICRC-2 Motoko Implementation
 
-English | [Français](./docs/README.fr.md) | [简体中文](./docs/README.zh-CN.md) | [日本語](./docs/README.jp.md) | [español](./docs/README.es.md) 
+English | [Français](./docs/README.fr.md) | [简体中文](./docs/README.zh.md) | [日本語](./docs/README.jp.md) | [español](./docs/README.es.md) 
 
 This repository contains the implementation of the ICRC token standard.
 
@@ -56,13 +56,14 @@ dfx deploy icrc --argument '( record {
 ```
 
 ### Additional Configuration:
-```motoko
+
 advanced_settings:
 
+```sh
 type AdvancedSettings = {
     burned_tokens : Balance;
     transaction_window : Timestamp;
-    permitted_drift : Timestamp
+    permitted_drift : Timestamp;
 }
 ```
 

@@ -14,7 +14,7 @@
 まず、Node.js、npm、dfx、および [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install) を用意する必要があります。
 
 [dfx のインストール](https://internetcomputer.org/docs/building-apps/getting-started/install)：（Linux または macOS）
-```
+```sh
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
@@ -22,7 +22,7 @@ mops のインストール：
 `dfx extension install mops` または `npm i -g ic-mops`
 
 プロジェクトの実行：（パラメータを適宜置き換えてください）
-```motoko
+```sh
     git clone https://github.com/NashAiomos/icrc_motoko
     cd icrc_motoko
     mops install
@@ -53,10 +53,15 @@ mops のインストール：
 ```
 
 追加設定：
-```
+
 advanced_settings:
 
-type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestamp; permitted_drift : Timestamp }
+```sh
+type AdvancedSettings = {
+    burned_tokens : Balance;
+    transaction_window : Timestamp;
+    permitted_drift : Timestamp;
+}
 ```
 
 <br>

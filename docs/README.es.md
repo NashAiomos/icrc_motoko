@@ -54,9 +54,10 @@ dfx deploy icrc --argument '( record {
 ```
 
 ### Configuración Adicional:
-```motoko
+
 advanced_settings:
 
+```sh
 type AdvancedSettings = {
     burned_tokens : Balance;
     transaction_window : Timestamp;
