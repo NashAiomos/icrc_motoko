@@ -1,5 +1,7 @@
 # ICRC-1 & ICRC-2 Motoko Implementation
-This repo contains the implementation of the ICRC token standard. 
+This repo contains the implementation of the ICRC-1 and ICRC-2 token standard. 
+
+main 分支是包含所有功能的主要分支，ICRC-2 分支是标准的 ICRC-2 实现，ICRC-1 分支包含标准的 ICRC-1 实现。
 
 ## Local Test Deployment
 First, we have to have nodejs, npm, dfx and [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install).
