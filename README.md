@@ -1,212 +1,174 @@
 # ICRC-1 & ICRC-2 Motoko Implementation
-This repo contains the implementation of the ICRC-1 and ICRC-2 token standard. 
 
-main 分支是包含所有功能的主要分支，ICRC-2 分支是标准的 ICRC-2 实现，ICRC-1 分支包含标准的 ICRC-1 实现。
+This repository contains the implementation of the ICRC token standard.
+
+The `main` branch is the primary branch that includes all features.
+
+The `ICRC-2` branch is the standard implementation of ICRC-2.
+
+The `ICRC-1` branch contains the standard implementation of ICRC-1.
 
 ## Local Test Deployment
-First, we have to have nodejs, npm, dfx and [mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install).
 
-安装[dfx](https://internetcomputer.org/docs/building-apps/getting-started/install)：（Linux or macOS）
-```
+To get started, ensure you have **Node.js**, **npm**, **dfx**, and **[mops](https://j4mwm-bqaaa-aaaam-qajbq-cai.ic0.app/#/docs/install)** installed on your system.
+
+### Install [dfx](https://internetcomputer.org/docs/building-apps/getting-started/install) (Linux or macOS):
+```sh
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
-安装 mops ：
-```
+### Install mops:
+```sh
 dfx extension install mops
 ```
 
-运行项目：(替换其中的参数)
-```motoko
-    git clone https://github.com/NashAiomos/icrc_motoko
-    cd icrc_motoko
-    mops install
-    dfx start --background --clean
+### Run the Project (replace parameters as needed):
+```sh
+git clone https://github.com/NashAiomos/icrc_motoko
+cd icrc_motoko
+mops install
+dfx start --background --clean
 
-    dfx deploy icrc --argument '( record {                    
-        name = "aaa";
-        symbol = "aaa";
-        decimals = 8;
-        fee = 1_000;
-        max_supply = 100_000_000_000_000;
-        initial_balances = vec {
+dfx deploy icrc --argument '( record {                    
+    name = "aaa";
+    symbol = "aaa";
+    decimals = 8;
+    fee = 1_000;
+    max_supply = 100_000_000_000_000;
+    initial_balances = vec {
+        record {
             record {
-                record {
-                    owner = principal "hbvut-2ui4m-jkj3c-ey43g-lbtbp-abta2-w7sgj-q4lqx-s6mrb-uqqd4-mqe";
-                    subaccount = null;
-                };
-                100_000_000_000_000
+                owner = principal "hbvut-2ui4m-jkj3c-ey43g-lbtbp-abta2-w7sgj-q4lqx-s6mrb-uqqd4-mqe";
+                subaccount = null;
             };
+            100_000_000_000_000
         };
-        min_burn_amount = 10_000;
-        minting_account = opt record {
-            owner = principal "hbvut-2ui4m-jkj3c-ey43g-lbtbp-abta2-w7sgj-q4lqx-s6mrb-uqqd4-mqe";
-            subaccount = null;
-        };
-        advanced_settings = null;
-    })'
+    };
+    min_burn_amount = 10_000;
+    minting_account = opt record {
+        owner = principal "hbvut-2ui4m-jkj3c-ey43g-lbtbp-abta2-w7sgj-q4lqx-s6mrb-uqqd4-mqe";
+        subaccount = null;
+    };
+    advanced_settings = null;
+})'
 ```
 
-额外的配置：
-```
+### Additional Configuration:
+```motoko
 advanced_settings:
 
 type AdvancedSettings = { burned_tokens : Balance; transaction_window : Timestamp; permitted_drift : Timestamp }
 ```
 
-## 项目整体架构
+---
 
-项目实现了 ICRC-2 代币标准，采用 Motoko 语言开发，主要逻辑在 src 文件夹中。
+## Project Architecture
 
-由两个 canister 组成， Token 和 Archive ：
+The project implements the **ICRC-2 token standard** using the **Motoko** programming language, with the primary logic located in the `src` folder. It consists of two main canisters:
 
-* Token Canister
+### 1. Token Canister
+- **Purpose**: Provides all core token functionalities and state management per the ICRC-2 standard, along with integrated transaction archiving logic.
+- **Definition**: Defined in `Token.mo`.
 
-  提供 ICRC-2 标准的所有核心代币功能和状态管理，并集成了交易存档逻辑。由 Token.mo 定义。
+### 2. Archive Canister
+- **Purpose**: Dedicated to storing and querying archived transaction records, expanding the storage capacity of the main ledger. It supports automatic scaling, with each canister capable of storing **375 GiB** of transactions.
+- **Definition**: Defined in `Archive.mo`.
 
-* Archive Canister
+Additionally, the project includes auxiliary modules for account encoding/decoding, transaction processing, type definitions, and utility functions. Test code is located in the `tests` folder and requires separate deployment.
 
-  专门用于存储和查询存档的交易记录，用以扩展主账本存储容量。支持自动扩容，每个 canister 储存 375GiB 交易。由 Archive.mo 定义。
-
-还有其他辅助模块，账户编码/解码、交易处理、各类类型定义和工具函数。
-
-测试代码在 tests 文件夹里。（需要单独部署）
+---
 
 ## Token Canister
-实现文件： Token.mo
 
-提供 ICRC-2 代币标准接口，包括查询代币名称、符号、小数位、余额、总供应量、手续费、支持标准等。
-实现代币的状态管理、转账、铸币、销币等业务逻辑。
+### Implementation File: `Token.mo`
 
-集成存档逻辑：
-当主账本中交易数量超过设定上限（如 2000 笔时），调用存档逻辑将老交易转存到 Archive Canister 。
+The Token Canister provides the **ICRC-2 token standard interfaces**, including querying token details (name, symbol, decimals, balance, total supply, fees, supported standards) and implementing token state management, transfers, minting, burning, and other business logic.
 
-在 lib.mo 中集成了 Token 的整体逻辑，并调用 Transfer.mo 处理交易验证和请求，将最终交易写入本地的交易缓冲区。缓冲区超出最大交易数量后，会触发存档逻辑（见 update_canister 和 append_transactions）。
+#### Archiving Logic:
+- When the number of transactions in the main ledger exceeds a set limit (e.g., 2,000 transactions), the archiving logic is triggered to transfer older transactions to the **Archive Canister**.
+- The overall logic is integrated in `lib.mo`, which calls `Transfer.mo` to handle transaction validation and requests. Final transactions are written to a local transaction buffer, and when the buffer exceeds the maximum transaction limit, archiving is initiated (see `update_canister` and `append_transactions`).
 
-主要方法：
+#### Main Methods:
+- **`icrc1_name()`**: Returns the token's name.
+- **`icrc1_symbol()`**: Returns the token's symbol.
+- **`icrc1_decimals()`**: Returns the number of decimal places for the token.
+- **`icrc1_fee()`**: Returns the fee per transfer.
+- **`icrc1_metadata()`**: Returns the token's metadata.
+- **`icrc1_total_supply()`**: Returns the current circulating supply of the token.
+- **`icrc1_minting_account()`**: Returns the account authorized to mint/burn tokens.
+- **`icrc1_balance_of(account)`**: Queries the balance of a specified account.
+- **`icrc1_transfer(args)`**: Executes a transfer operation (internally determines if it’s a regular transfer, minting, or burning based on sender/receiver).
+- **`icrc2_approve()`**: Authorizes an account to transfer tokens on behalf of the authorizer.
+- **`icrc2_transfer_from()`**: Allows an authorized account to perform token transfers.
+- **`icrc2_allowance()`**: Queries the number of tokens an account (owner) has authorized another account (spender) to transfer.
+- **`mint(args)`** and **`burn(args)`**: Helper functions for minting and burning tokens, respectively.
+- **`get_transaction(tx_index)`** and **`get_transactions(req)`**: Provide queries for single or batch transactions; redirects to the Archive Canister when the transaction limit is exceeded.
+- **`deposit_cycles()`**: Allows users to deposit Cycles into the canister.
 
-icrc1_name()：返回代币的名称。
-
-icrc1_symbol()：返回代币的符号。
-
-icrc1_decimals()：返回代币的小数位数。
-
-icrc1_fee()：返回每次转账的手续费。
-
-icrc1_metadata()：返回代币的元数据。
-
-icrc1_total_supply()：返回当前流通中的代币供应量。
-
-icrc1_minting_account()：返回允许铸币/销币的账户。
-
-icrc1_balance_of(account)：查询指定账户的余额。
-
-icrc1_transfer(args)：执行转账操作（内部根据发送者/接收者判断是普通转账、铸币或销币）。
-
-**icrc2_approve()**：授权一个账户可以代表授权者进行代币转移操作。
-
-**icrc2_transfer_from()**：允许已获得授权的账户执行代币转移。
-
-**icrc2_allowance()**：查询并返回某个账户（owner）已经授权给另一个账户（spender）可转移的代币数量。
-
-mint(args) 和 burn(args)：辅助函数分别用于铸币和销币操作。
-
-get_transaction(tx_index) 与 get_transactions(req)：提供对单笔或批量交易的查询，当交易数量超过上限时转而查询 Archive Canister。
-
-deposit_cycles()：允许用户向 canister 存入 Cycles 。
+---
 
 ## Archive Canister
-实现文件： Archive.mo
 
-为 Token Canister 提供交易存档存储。当主 canister 中存储的交易超出一定容量时，调用 append_transactions 方法将老交易存档保存，从而降低主账本存储压力。
+### Implementation File: `Archive.mo`
 
-存档模块内部使用稳定内存（通过 ExperimentalStableMemory）以及稳定树映射（StableTrieMap）来管理存储数据，并以固定 bucket 形式进行存档操作。
+The Archive Canister provides transaction archiving storage for the Token Canister. When the main canister’s transaction storage exceeds a certain capacity, the `append_transactions` method is called to archive older transactions, reducing storage pressure on the main ledger.
 
-主要方法：
+#### Storage Mechanism:
+- Uses **stable memory** (via `ExperimentalStableMemory`) and a **stable trie map** (`StableTrieMap`) to manage data, organized in fixed-size buckets for archiving.
 
-append_transactions(txs)：验证调用权限（仅 Ledger canister 可调用），按照每个 bucket（固定大小 1000 笔）存储交易记录到存档存储中。
+#### Main Methods:
+- **`append_transactions(txs)`**: Verifies caller permissions (only the Ledger canister can call it) and stores transaction records in fixed-size buckets (1,000 transactions each) in the archive storage.
+- **`total_transactions()`**: Returns the total number of transactions in the archive.
+- **`get_transaction(tx_index)`**: Queries a single transaction by its index.
+- **`get_transactions(req)`**: Queries transaction records within a requested range, supporting pagination.
+- **`remaining_capacity()`**: Returns the remaining storage capacity before the archive canister is full.
+- **`deposit_cycles()`**: Receives and deposits Cycles.
 
-total_transactions()：返回存档中的交易总数。
+---
 
-get_transaction(tx_index)：根据交易索引在存档中查询单笔交易。
+## Auxiliary Modules
 
-get_transactions(req)：按请求范围查询存档中的交易记录，支持分页式查询。
+### Type Definitions (Types)
+- **File**: `src/ICRC/Types.mo`
+- **Purpose**: Defines types such as `Account`, `TransferArgs`, `Transaction`, `TransferResult`, and the overall token data structure `TokenData`. These form the foundational data structures and interface protocols of the system.
 
-remaining_capacity()：返回存档 canister 在存满之前剩余的存储容量。
+### Account Operations (Account)
+- **File**: `src/ICRC/Account.mo`
+- **Purpose**: Provides encoding and decoding functions for ICRC-1 accounts, converting between text representation and internal binary format per the ICRC-1 standard.
 
-deposit_cycles()：接收并存入 Cycles 。
+### Transaction Processing (Transfer)
+- **File**: `src/ICRC/Transfer.mo`
+- **Purpose**: Implements transaction request validation logic, checking memo length, fees, account balances, creation time (expired or future), and duplicate transactions. It returns validation results and assists in determining whether the transaction is a transfer, minting, or burning.
 
+### Utility Functions (Utils)
+- **File**: `src/ICRC/Utils.mo`
+- **Purpose**: Includes functions for initializing metadata, generating supported standards, creating default subaccounts, hash functions, and converting transaction requests to final transaction formats. It serves as a utility module called by `lib.mo`.
 
-## 辅助模块
-类型定义（Types）
+### Main Logic (lib)
+- **File**: `src/ICRC/lib.mo`
+- **Purpose**: Combines various modules to provide all external ICRC-2 Token interfaces. It calls `Utils`, `Transfer`, and `Account` to handle token initialization, state management, transaction operations, archiving logic, and balance queries.
 
-文件：src/ICRC/Types.mo
+---
 
-定义了各种类型，比如 Account、TransferArgs、Transaction、TransferResult、以及 Token 的整体数据结构 TokenData。这些类型构成整个系统的基本数据结构和接口协议。
+## Test Modules
 
-<br>
+Test code is located in the `ICRC1` folder and includes:
 
-账户操作（Account）
+### ICRC1.ActorTest.mo
+- **Purpose**: Tests token initialization, querying basic interfaces (name, symbol, decimals, fee), and transaction methods (mint, burn, transfer), verifying account balance updates and transaction archiving.
 
-文件：src/ICRC/Account.mo
+### Account.Test.mo
+- **Purpose**: Tests account encoding/decoding functions to ensure accurate conversion between text representation and internal binary format.
 
-提供了 ICRC-1 账户的编码与解码功能，依据 ICRC-1 标准实现账户地址的文本表示和内部二进制格式的转换。
+### Archive.ActorTest.mo
+- **Purpose**: Tests the Archive Canister’s archiving functions, including appending transactions, batch querying, and single transaction queries.
 
-<br>
+### ActorTest.mo
+- **Purpose**: The test entry file, responsible for running the above test modules sequentially and outputting the overall test results.
 
-交易处理（Transfer）
+### Test Utilities (ActorSpec)
+- **File**: `tests/utils/ActorSpec.mo`
+- **Purpose**: Provides simple test descriptions, assertions, and group running functions to assist in writing and executing test cases.
 
-文件：src/ICRC/Transfer.mo
-
-实现了交易请求的验证逻辑，包括检查备注长度、手续费、账户余额、创建时间是否过期或未来、以及重复交易检查等。该模块返回验证结果，并辅助决定交易是转账、铸币或销币。
-
-<br>
-
-工具函数（Utils）
-
-文件：src/ICRC/Utils.mo
-
-包含了元数据的初始化、支持标准的生成、账户的默认子账户、哈希函数、以及从交易请求到最终交易的格式转换等功能。也是 lib.mo 调用的工具模块。
-
-<br>
-
-主逻辑（lib）
-
-文件：src/ICRC/lib.mo
-
-将各个部分组合在一起，提供了对外 ICRC-2 Token 的所有接口。它调用 Utils、Transfer、Account 等模块，实现了代币的初始化、状态管理、交易操作、存档逻辑以及余额查询等功能。
-
-## 测试模块
-测试代码分布在 ICRC1 下，主要包括：
-
-ICRC1.ActorTest.mo
-
-测试包括 Token 的初始化、查询 name、symbol、decimals、fee 等基本接口，以及 mint、burn、transfer 等交易方法，验证账户余额更新、交易存档等功能。
-
-<br>
-
-Account.Test.mo
-
-专门测试账户编码、解码功能，确保账户文本表示与内部二进制格式的正确转换。
-
-<br>
-
-Archive.ActorTest.mo
-
-专门测试 Archive Canister 的存档功能，包括追加交易、批量查询交易和单笔查询交易等。
-
-<br>
-
-ActorTest.mo
-
-测试入口文件，负责依次运行上述测试模块，并输出整体测试结果。
-
-<br>
-
-测试工具（ActorSpec）
-文件：tests/utils/ActorSpec.mo
-提供简单的测试描述、断言和分组运行功能，用于帮助编写和运行测试用例。
-
-<br>
-
-makefile：提供了测试、文档生成、actor-test 等命令，方便本地构建和执行测试。
+### Makefile
+- **Purpose**: Provides commands for testing, documentation generation, and running actor-tests, facilitating local builds and test execution.
