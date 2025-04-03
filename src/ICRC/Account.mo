@@ -100,7 +100,7 @@ module {
         };
     };
 
-    /// 实现 ICRC-1 账户的文本表示形式 [解码标准](https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1#decoding)
+    /// 实现 ICRC-1 账户的文本表示形式解码标准
     public func decode(encoded : T.EncodedAccount) : ?T.Account {
         let bytes = Blob.toArray(encoded);
         let size = bytes.size();
