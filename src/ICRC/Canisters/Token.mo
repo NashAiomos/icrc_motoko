@@ -9,6 +9,8 @@ import SB "mo:StableBuffer/StableBuffer";
 
 import ICRC "..";
 import Archive "Archive";
+import Principal "mo:base/Principal";
+import Freeze "../Freeze.mo";
 
 shared ({ caller = _owner }) actor class Token(
     init_args : ICRC.TokenInitArgs,
@@ -105,9 +107,16 @@ shared ({ caller = _owner }) actor class Token(
     };
 
     // freeze
-    public shared ({ caller }) func freeze() : async () {
-        ICRC.freeze(token, caller);
+    public shared ({ caller }) func freeze_account(account : Principal) : async () {
+        Freeze.freeze_account(token, account, _owner, caller);
     };
 
+    public shared ({ caller }) func unfreeze_account(account : Principal) : async () {
+        Freeze.unfreeze_account(token, account, _owner, caller);
+    };
+
+    public shared query func is_frozen(account : Principal) : async Bool {
+        Freeze.is_frozen(token, account);
+    };
     
 };
