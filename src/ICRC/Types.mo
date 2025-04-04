@@ -86,23 +86,6 @@ module {
         created_at_time : ?Nat64;
     };
 
-    /// ICRC-2 转账操作参数
-    public type TransferFromArgs = {
-        spender_subaccount : ?Subaccount;
-        from : Account;
-        to : Account;
-        amount : Balance;
-        fee : ?Balance;
-        memo : ?Blob;
-        created_at_time : ?Nat64;
-    };
-
-    /// ICRC-2 授权额度参数
-    public type AllowanceArgs = {
-        owner : Account;
-        spender : Account;
-    };
-
     /// 交易请求的内部表示
     public type TransactionRequest = {
         kind : TxKind;
@@ -306,7 +289,7 @@ module {
         archive : ArchiveData;
 
         /// 存储授权额度映射，键为由拥有者与被授权方拼接得到的 EncodedAccount
-        allowances : StableTrieMap<EncodedAccount, Balance>;
+        allowances : StableTrieMap<EncodedAccount, Allowance>;
     };
 
     // Rosetta API
@@ -353,4 +336,66 @@ module {
 
     /// ICRC token 及 Rosetta canister 的接口
     public type FullInterface = TokenInterface and RosettaInterface;
+
+    // ICRC-2 类型
+    public type ApproveArgs = {
+        from_subaccount : ?Subaccount;
+        spender : Account;
+        amount : Balance;
+        expected_allowance : ?Balance;
+        expires_at : ?Timestamp;
+        fee : ?Balance;
+        memo : ?Blob;
+        created_at_time : ?Nat64;
+    };
+
+    public type ApproveError = {
+        #BadFee : { expected_fee : Balance };
+        #InsufficientFunds : { balance : Balance };
+        #AllowanceChanged : { current_allowance : Balance };
+        #Expired : { ledger_time : Timestamp };
+        #TooOld;
+        #CreatedInFuture : { ledger_time : Timestamp };
+        #Duplicate : { duplicate_of : TxIndex };
+        #TemporarilyUnavailable;
+        #GenericError : { error_code : Nat; message : Text };
+    };
+
+    public type ApproveResult = {
+        #Ok : TxIndex;
+        #Err : ApproveError;
+    };
+
+    public type TransferFromArgs = {
+        spender_subaccount : ?Subaccount;
+        from : Account;
+        to : Account;
+        amount : Balance;
+        fee : ?Balance;
+        memo : ?Blob;
+        created_at_time : ?Nat64;
+    };
+
+    public type TransferFromError = {
+        #BadFee : { expected_fee : Balance };
+        #BadBurn : { min_burn_amount : Balance };
+        #InsufficientFunds : { balance : Balance };
+        #InsufficientAllowance : { allowance : Balance };
+        #TooOld;
+        #CreatedInFuture : { ledger_time : Timestamp };
+        #Duplicate : { duplicate_of : TxIndex };
+        #TemporarilyUnavailable;
+        #GenericError : { error_code : Nat; message : Text };
+    };
+
+    public type AllowanceArgs = {
+        owner : Account;
+        spender : Account;
+    };
+
+    public type Allowance = {
+        allowance : Balance;
+        expires_at : ?Timestamp;
+    };
+
 };
