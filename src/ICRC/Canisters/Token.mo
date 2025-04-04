@@ -76,15 +76,15 @@ shared ({ caller = _owner }) actor class Token(
     };
 
     // ICRC-2 代币标准函数
-    public shared ({ caller }) func icrc2_approve(spender : ICRC.Account, amount : ICRC.Balance) : async () {
-        ICRC.approve(token, spender, amount, caller);
+    public shared ({ caller }) func icrc2_approve(args : ICRC.ApproveArgs) : async { #Ok : Nat; #Err : ICRC.ApproveError } {
+        ICRC.approve(token, args, caller);
     };
 
     public shared ({ caller }) func icrc2_transfer_from(args : ICRC.TransferFromArgs) : async ICRC.TransferResult {
         await ICRC.transfer_from(token, args, caller);
     };
     
-    public shared ({ caller }) func icrc2_allowance(args : ICRC.AllowanceArgs) : async { allowance : ICRC.Balance; expires_at : ?Nat64 } {
+    public shared func ({ caller })  icrc2_allowance(args : { owner : ICRC.Account; spender : ICRC.Account }) : async { allowance : ICRC.Balance; expires_at : ?ICRC.Timestamp } {
         await ICRC.allowance(token, args);
     };
 
