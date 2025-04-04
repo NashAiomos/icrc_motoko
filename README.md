@@ -109,6 +109,9 @@ The Token Canister provides the **ICRC-2 token standard interfaces**, including 
 - **`mint(args)`** and **`burn(args)`**: Helper functions for minting and burning tokens, respectively.
 - **`get_transaction(tx_index)`** and **`get_transactions(req)`**: Provide queries for single or batch transactions; redirects to the Archive Canister when the transaction limit is exceeded.
 - **`deposit_cycles()`**: Allows users to deposit Cycles into the canister.
+- **`freeze_account(account)`**: Freezes the specified account, preventing it from performing any transactions.
+- **`unfreeze_account(account)`**: Unfreezes the specified account, restoring its ability to perform transactions.
+- **`is_account_frozen(account)`**: Checks if a specific account is currently frozen.
 
 <br>
 
@@ -152,3 +155,8 @@ The Archive Canister provides transaction archiving storage for the Token Canist
 ### Main Logic (lib)
 - **File**: `src/ICRC/lib.mo`
 - **Purpose**: Combines various modules to provide all external ICRC-2 Token interfaces. It calls `Utils`, `Transfer`, and `Account` to handle token initialization, state management, transaction operations, archiving logic, and balance queries.
+
+### Freeze Logic (Freeze)
+- **File**: `src/ICRC/Freeze.mo`
+- **Purpose**: The freeze functionality allows administrators to restrict specific accounts from performing any token operations (e.g., transfers, approvals).Frozen accounts are stored in a dedicated data structure for quick lookup.The `freeze_account` and `unfreeze_account` methods can only be called by authorized accounts (e.g., the minting account or a designated admin account).
+Before processing any transaction, the system checks if the involved accounts are frozen. If an account is frozen, the transaction is rejected with an appropriate error message.

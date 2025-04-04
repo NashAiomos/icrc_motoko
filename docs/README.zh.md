@@ -123,6 +123,12 @@ get_transaction(tx_index) 与 get_transactions(req)：提供对单笔或批量�
 
 deposit_cycles()：允许用户向 canister 存入 Cycles 。
 
+freeze_account(account)：冻结指定账户，阻止其执行任何交易。
+
+unfreeze_account(account)：解冻指定账户，恢复其执行交易的能力。
+
+is_account_frozen(account)：检查指定账户是否已被冻结。
+
 ## Archive Canister
 实现文件： Archive.mo
 
@@ -184,3 +190,11 @@ deposit_cycles()：接收并存入 Cycles 。
 
 将各个部分组合在一起，提供了对外 ICRC-2 Token 的所有接口。它调用 Utils、Transfer、Account 等模块，实现了代币的初始化、状态管理、交易操作、存档逻辑以及余额查询等功能。
 
+<br>
+
+冻结逻辑（Freeze）
+
+文件：src/ICRC/Freeze.mo
+
+冻结功能允许管理员限制特定账户执行任何代币操作（例如转账、批准）。
+冻结的账户存储在专用数据结构中以便快速查询。只有授权账户（例如铸币账户或指定的管理员账户）可调用 freeze_account 和 unfreeze_account 方法。在处理任何交易之前，系统会检查相关账户是否被冻结。如果账户被冻结，则交易会被拒绝，并给出相应的错误信息。

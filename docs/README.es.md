@@ -109,6 +109,9 @@ El Canister de Token proporciona las **interfaces del estándar de token ICRC-2*
 - **`mint(args)`** y **`burn(args)`**: Funciones auxiliares para acuñar y quemar tokens, respectivamente.
 - **`get_transaction(tx_index)`** y **`get_transactions(req)`**: Proporcionan consultas para transacciones individuales o por lotes; redirige al Canister de Archivo cuando se excede el límite de transacciones.
 - **`deposit_cycles()`**: Permite a los usuarios depositar Cycles en el canister 🙂.
+- `freeze_account(account)`: Congela la cuenta especificada, impidiendo que realice cualquier transacción.
+- `unfreeze_account(account)`: Descongela la cuenta especificada, restaurando su capacidad para efectuar transacciones.
+- `is_account_frozen(account)`: Comprueba si la cuenta especificada está actualmente congelada.
 
 <br>
 
@@ -153,3 +156,7 @@ El Canister de Archivo proporciona almacenamiento de archivado de transacciones 
 - **Archivo**: `src/ICRC/lib.mo`
 - **Propósito**: Combina varios módulos para proporcionar todas las interfaces externas del Token ICRC-2. Llama a `Utils`, `Transfer` y `Account` para manejar la inicialización del token, la gestión del estado, las operaciones de transacciones, la lógica de archivado y las consultas de balance.
 
+### Lógica de congelación (Freeze)
+- **Archivo**: `src/ICRC/Freeze.mo`
+- **Propósito**: La funcionalidad de congelación permite a los administradores restringir la ejecución de operaciones con tokens (por ejemplo, transferencias, aprobaciones) en cuentas específicas. Las cuentas congeladas se almacenan en una estructura de datos dedicada que permite una búsqueda rápida.Los métodos freeze_account y unfreeze_account solo pueden ser utilizados por cuentas autorizadas (por ejemplo, la cuenta de acuñación o una cuenta administrativa designada).
+Antes de procesar cualquier transacción, el sistema verifica si la cuenta en cuestión está congelada. Si es así, la transacción se rechaza con un mensaje de error apropiado.

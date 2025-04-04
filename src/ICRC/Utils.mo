@@ -22,7 +22,7 @@ import Account "Account";
 import T "Types";
 
 module {
-    // 创建具有默认元数据的 StableBuffer 并返回它。
+    // 创建具有默认元数据的 StableBuffer 并返回它
     public func init_metadata(args : T.InitArgs) : StableBuffer.StableBuffer<T.MetaDatum> {
         let metadata = SB.initPresized<T.MetaDatum>(4);
         SB.add(metadata, ("icrc1:fee", #Nat(args.fee)));
@@ -38,7 +38,7 @@ module {
         url = "https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-2";
     };
 
-    // 创建具有默认支持标准的 StableBuffer 并返回它。
+    // 创建具有默认支持标准的 StableBuffer 并返回它
     public func init_standards() : StableBuffer.StableBuffer<T.SupportedStandard> {
         let standards = SB.initPresized<T.SupportedStandard>(4);
         SB.add(standards, default_standard);
@@ -46,14 +46,14 @@ module {
         standards;
     };
 
-    // 返回当用户未指定子账户时的默认子账户。
+    // 返回当用户未指定子账户时的默认子账户
     public func default_subaccount() : T.Subaccount {
         Blob.fromArray(
             Array.tabulate(32, func(_ : Nat) : Nat8 { 0 }),
         );
     };
 
-    // 这是已废弃 Hash.hashNat8 ，重新定义以避免警告。
+    // 这是已废弃 Hash.hashNat8 ，重新定义以避免警告
     func hashNat8(key : [Nat32]) : Hash.Hash {
         var hash : Nat32 = 0;
         for (natOfKey in key.vals()) {
@@ -67,7 +67,7 @@ module {
         return hash;
     };
 
-    // 从 `n` 的最末32位计算哈希，忽略其他位。
+    // 从 `n` 的最末32位计算哈希，忽略其他位
     public func hash(n : Nat) : Hash.Hash {
         let j = Nat32.fromNat(n);
         hashNat8([
@@ -78,7 +78,7 @@ module {
         ]);
     };
 
-    // 将不同操作参数格式化为 `TransactionRequest`，一种便于访问字段的内部类型。
+    // 将不同操作参数格式化为 `TransactionRequest`，一种便于访问字段的内部类型
     public func create_transfer_req(
         args : T.TransferArgs,
         owner : Principal,

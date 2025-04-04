@@ -109,6 +109,9 @@ Le Canister de Token fournit les **interfaces de la norme de token ICRC-2**, inc
 - **`mint(args)`** et **`burn(args)`** : Fonctions d'aide pour la création et la destruction de tokens, respectivement.
 - **`get_transaction(tx_index)`** et **`get_transactions(req)`** : Fournissent des requêtes pour une transaction unique ou par lots ; redirigent vers le Canister d'Archive lorsque la limite de transactions est dépassée.
 - **`deposit_cycles()`** : Permet aux utilisateurs de déposer des Cycles dans le canister.
+- **`freeze_account(account)`**: Gèle le compte spécifié, empêchant ainsi toute transaction.
+- **`unfreeze_account(account)`**: Débloque le compte spécifié, rétablissant ainsi sa capacité à effectuer des transactions.
+- **`is_account_frozen(account)`**: Vérifie si le compte spécifié est actuellement bloqué.
 
 <br>
 
@@ -152,4 +155,8 @@ Le Canister d'Archive fournit un stockage d'archivage des transactions pour le C
 ### Logique Principale (lib)
 - **Fichier** : `src/ICRC/lib.mo`
 - **But** : Combine divers modules pour fournir toutes les interfaces externes du Token ICRC-2. Il appelle `Utils`, `Transfer` et `Account` pour gérer l'initialisation du token, la gestion d'état, les opérations de transaction, la logique d'archivage et les requêtes de solde.
+
+### Logique de gel (Freeze)
+- **Fichier** : `src/ICRC/Freeze.mo`
+- **But** : La fonctionnalité de gel permet aux administrateurs de restreindre l'exécution d'opérations liées aux tokens (par exemple, transferts, approbations) sur des comptes spécifiques. Les comptes gelés sont stockés dans une structure de données dédiée pour permettre une recherche rapide.Les méthodes freeze_account et unfreeze_account ne sont accessibles qu'aux comptes autorisés (par exemple, le compte de mint ou un compte administrateur désigné).Avant tout traitement de transaction, le système vérifie si le compte concerné est gelé. Si c'est le cas, la transaction est rejetée avec un message d'erreur approprié.
 
