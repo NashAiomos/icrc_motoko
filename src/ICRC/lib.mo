@@ -433,10 +433,28 @@ module {
 
     /// ICRC-2 账户授权函数
     public func approve(token : T.TokenData, spender : T.Account, amount : T.Balance, caller : Principal) : () {
+        // 验证发起者账户
+        if (Principal.isAnonymous(caller)) {
+            Debug.trap("Anonymous caller not allowed");
+        };
+
+        // 验证spender账户
+        if (not Account.validate(spender)) {
+            Debug.trap("Invalid spender account");
+        };
+
+        // 检查冻结状态
         if (Freeze.is_frozen(token, caller)) {
             Debug.trap("Frozen account cannot approve transfers");
         };
+
+        // 检查调用者账户余额是否充足
         let owner_account : T.Account = { owner = caller; subaccount = null };
+        let owner_balance = balance_of(token, owner_account);
+        if (amount > owner_balance) {
+            Debug.trap("Insufficient balance for approval");
+        };
+
         let owner_encoded = Account.encode(owner_account);
         let spender_encoded = Account.encode(spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
@@ -451,40 +469,48 @@ module {
 
     /// ICRC-2 代表转账函数
     public func transfer_from(token : T.TokenData, args : T.TransferFromArgs, caller : Principal) : async T.TransferResult {
+        // 检查转出账户冻结状态
         if (Freeze.is_frozen(token, args.from.owner)) {
             return #Err(#FrozenAccount);
         };
+        
+        // 检查转入账户冻结状态 
+        if (Freeze.is_frozen(token, args.to.owner)) {
+            return #Err(#FrozenAccount);
+        };
+
         let owner_encoded = Account.encode(args.from);
         let spender_account : T.Account = { owner = caller; subaccount = null };
         let spender_encoded = Account.encode(spender_account);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
+        
+        // 检查授权额度，并更新授权额度
         let current_allowance = StableTrieMap.get(
             token.allowances,
             Blob.equal,
             Blob.hash,
             key,
         );
+
         switch (current_allowance) {
             case (?allowed) {
                 if (args.amount > allowed) {
                     return #Err(#InsufficientFunds { balance = allowed });
                 };
+                // 减少授权额度以防止重复使用
+                StableTrieMap.put(
+                    token.allowances,
+                    Blob.equal,
+                    Blob.hash,
+                    key,
+                    allowed - args.amount,
+                );
             };
             case (_) {
                 return #Err(#InsufficientFunds { balance = 0 });
             };
         };
-        let new_allowance = switch (current_allowance) {
-            case (?allowed) { allowed - args.amount };
-            case (_) 0;
-        };
-        StableTrieMap.put(
-            token.allowances,
-            Blob.equal,
-            Blob.hash,
-            key,
-            new_allowance,
-        );
+
         let transfer_args : T.TransferArgs = {
             from_subaccount = args.from.subaccount;
             to = args.to;
@@ -507,12 +533,18 @@ module {
 
     /// ICRC-2 授权查询函数，根据授权参数返回对应的授权额度
     public func allowance(token : T.TokenData, args : { owner : T.Account; spender : T.Account }) : async { allowance : T.Balance; expires_at : ?Nat64 } {
+        // 验证 owner 和 spender 账户
+        if (not Account.validate(args.owner) or not Account.validate(args.spender)) {
+            Debug.trap("Invalid account");
+        };
+
         let owner_encoded = Account.encode(args.owner);
         let spender_encoded = Account.encode(args.spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         let current = StableTrieMap.get(token.allowances, Blob.equal, Blob.hash, key);
+        
         switch (current) {
-            case (?allowance) { { allowance = allowance; expires_at = null } };
+            case (?allowance) { { allowance; expires_at = null } };
             case (_) { { allowance = 0; expires_at = null } }
         }
     };
