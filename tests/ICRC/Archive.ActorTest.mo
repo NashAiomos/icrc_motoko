@@ -8,8 +8,8 @@ import Nat64 "mo:base/Nat64";
 import Principal "mo:base/Principal";
 import EC "mo:base/ExperimentalCycles";
 
-import Archive "../../src/ICRC1/Canisters/Archive";
-import T "../../src/ICRC1/Types";
+import Archive "../../src/ICRC/Canisters/Archive";
+import T "../../src/ICRC/Types";
 
 import ActorSpec "../utils/ActorSpec";
 

@@ -1,7 +1,7 @@
 import Debug "mo:base/Debug";
 
-import Archive "ICRC1/Archive.ActorTest";
-import ICRC1 "ICRC1/ICRC1.ActorTest";
+import Archive "ICRC/Archive.ActorTest";
+import ICRC "ICRC/ICRC.ActorTest";
 
 import ActorSpec "./utils/ActorSpec";
 
@@ -10,7 +10,7 @@ actor {
 
     let test_modules = [
         Archive.test,
-        ICRC1.test,
+        ICRC.test,
     ];
 
     public func run_tests() : async () {

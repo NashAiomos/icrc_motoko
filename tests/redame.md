@@ -20,8 +20,8 @@
     Building canisters...
     Shrink WASM module size.
     Installing canisters...
-    Installing code for canister icrc1, 
-    with canister ID q3fc5-haaaa-aaaaa-aaahq-cai
+    Installing code for canister icrc, 
+    with canister ID 73fc5-haaaa-aaaaa-aaahq-cai
 ```
 - Copy the text on the last line after the `ID` and replace it with the `<Enter Canister ID>` in the command below
 

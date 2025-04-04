@@ -5,9 +5,9 @@ import Principal "mo:base/Principal";
 
 import Itertools "mo:itertools/Iter";
 
-import Account "../../src/ICRC1/Account";
+import Account "../../src/ICRC/Account";
 import ActorSpec "../utils/ActorSpec";
-import Archive "../../src/ICRC1/Canisters/Archive";
+import Archive "../../src/ICRC/Canisters/Archive";
 
 let {
     assertTrue;

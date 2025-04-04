@@ -74,7 +74,7 @@ module {
     public let MAX_TRANSACTION_BYTES : Nat64 = 196;
     public let MAX_TRANSACTIONS_PER_REQUEST = 5000;
 
-    /// 初始化一个新的 ICRC-1 代币
+    /// 初始化一个新 ICRC-1 代币
     public func init(args : T.InitArgs) : T.TokenData {
         let {
             name;
@@ -407,7 +407,6 @@ module {
     };
 
     // 更新代币数据并管理交易
-    //
     // 在创建新交易的任何函数末尾添加
     func update_canister(token : T.TokenData) : async () {
         let txs_size = SB.size(token.transactions);
@@ -445,7 +444,7 @@ module {
         if (Principal.isAnonymous(caller)) {
             return #Err(#GenericError { 
                 error_code = 401; 
-                message = "Anonymous caller not allowed" 
+                message = "Anonymous caller not allowed"
             });
         };
 
@@ -453,7 +452,7 @@ module {
         if (args.spender.owner == caller) {
             return #Err(#GenericError { 
                 error_code = 400; 
-                message = "Cannot approve self" 
+                message = "Cannot approve self"
             });
         };
         
@@ -461,7 +460,7 @@ module {
         if (not Account.validate(args.spender)) {
             return #Err(#GenericError { 
                 error_code = 400; 
-                message = "Invalid spender account" 
+                message = "Invalid spender account"
             });
         };
 
@@ -469,7 +468,7 @@ module {
         if (Freeze.is_frozen(token, caller)) {
             return #Err(#GenericError { 
                 error_code = 403; 
-                message = "Frozen account cannot approve transfers" 
+                message = "Frozen account cannot approve transfers"
             });
         };
 
@@ -479,16 +478,16 @@ module {
         if (args.amount > caller_balance) {
             return #Err(#GenericError { 
                 error_code = 400;
-                message = "Insufficient balance for approval" 
+                message = "Insufficient balance for approval"
             });
         };
 
-        // 构造授权KEY
+        // 构造授权 key
         let owner_encoded = Account.encode(caller_account);
         let spender_encoded = Account.encode(args.spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         
-        // 如设置 expected_allowance，则要求当前值匹配
+        // 如设置 expected_allowance 则要求当前值匹配
         let current = StableTrieMap.get(token.allowances, Blob.equal, Blob.hash, key);
         let current_allowance = switch (current) {
             case (?info) { info.allowance };
@@ -516,7 +515,7 @@ module {
         if (Principal.isAnonymous(caller)) {
             return #Err(#GenericError { 
                 error_code = 401; 
-                message = "Anonymous caller not allowed" 
+                message = "Anonymous caller not allowed"
             });
         };
 

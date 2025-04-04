@@ -10,10 +10,10 @@ import StableBuffer "mo:StableBuffer/StableBuffer";
 
 import ActorSpec "../utils/ActorSpec";
 
-import ICRC1 "../../src/ICRC1";
-import T "../../src/ICRC1/Types";
+import ICRC1 "../../src/ICRC";
+import T "../../src/ICRC/Types";
 
-import U "../../src/ICRC1/Utils";
+import U "../../src/ICRC/Utils";
 
 module {
     public func test() : async ActorSpec.Group {
