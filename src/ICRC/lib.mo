@@ -9,7 +9,7 @@ import Nat64 "mo:base/Nat64";
 import Nat8 "mo:base/Nat8";
 import Option "mo:base/Option";
 import Principal "mo:base/Principal";
-import Text "mo:base/Text"; // 添加 Text 导入
+import Text "mo:base/Text";
 import EC "mo:base/ExperimentalCycles";
 import Time "mo:base/Time";
 
@@ -30,7 +30,7 @@ module {
     public type Account = T.Account;
     public type Subaccount = T.Subaccount;
     public type AccountBalances = T.AccountBalances;
-    public type Timestamp = T.Timestamp;  // 添加 Timestamp 类型导出
+    public type Timestamp = T.Timestamp;
 
     public type Transaction = T.Transaction;
     public type Balance = T.Balance;
