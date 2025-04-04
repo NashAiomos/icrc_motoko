@@ -84,7 +84,7 @@ shared ({ caller = _owner }) actor class Token(
         await ICRC.transfer_from(token, args, caller);
     };
     
-    public shared func ({ caller })  icrc2_allowance(args : { owner : ICRC.Account; spender : ICRC.Account }) : async { allowance : ICRC.Balance; expires_at : ?ICRC.Timestamp } {
+    public shared func icrc2_allowance(args : { owner : ICRC.Account; spender : ICRC.Account }) : async { allowance : ICRC.Balance; expires_at : ?ICRC.Timestamp } {
         await ICRC.allowance(token, args);
     };
 
