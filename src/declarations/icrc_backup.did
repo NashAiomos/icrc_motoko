@@ -110,5 +110,9 @@ service : (InitArgs) -> {
     get_transactions : (GetTransactionsRequest) -> (GetTransactionsResponse) query;
     get_transaction : (TxIndex) -> (opt Transaction);
     deposit_cycles : () -> ();
+
+    freeze_account : (principal) -> ();
+    unfreeze_account : (principal) -> ();
+    is_frozen : (principal) -> (bool) query;
 }
 
