@@ -12,7 +12,7 @@
     curl https://sh.rustup.rs -sSf | sh
 ```
 
-- Follow these [instructions](./readme.md#L16-42) to start the dfx local replica and deploy the icrc1 token
+- Follow these [instructions](../README.md#local-test-deployment) to start the dfx local replica and deploy the icrc1 token
 - Once the canister is deployed you should see a message like this
 
 ```
