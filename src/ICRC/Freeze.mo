@@ -4,7 +4,6 @@ import Debug "mo:base/Debug";
 
 import T "Types";
 
-/// 账户冻结模块: 提供账户冻结和解冻功能
 module {
     public type FreezeResult<T> = {
         #ok : T;
@@ -12,13 +11,16 @@ module {
     };
 
     public func freeze_account(token : T.TokenData, account : Principal, owner : Principal, caller : Principal) : FreezeResult<()> {
-        // 检查账户是否已被冻结
         if (is_frozen(token, account)) {
             return #err("Account is already frozen");
         };
         
         if (caller != owner) {
             return #err("Only owner can freeze accounts");
+        };
+
+        if (account == owner) {
+            return #err("Cannot freeze owner account");
         };
         
         STMap.put(
@@ -33,7 +35,6 @@ module {
     };
 
     public func unfreeze_account(token : T.TokenData, account : Principal, owner : Principal, caller : Principal) : FreezeResult<()> {
-        // 检查账户是否已被冻结
         if (not is_frozen(token, account)) {
             return #err("Account is already frozen");
         };
