@@ -36,15 +36,15 @@ module {
 
     public func unfreeze_account(token : T.TokenData, account : Principal, owner : Principal, caller : Principal) : FreezeResult<()> {
         if (not is_frozen(token, account)) {
-            return #err("Account is already frozen");
+            return #err("Account is not frozen");
         };
 
         if (caller != owner) {
-            return #err("Only owner can freeze accounts");
+            return #err("Only owner can unfreeze accounts");
         };
         
         ignore STMap.remove(
-            token.frozen_accounts, 
+            token.frozen_accounts,
             Principal.equal,
             Principal.hash,
             account,
