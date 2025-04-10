@@ -11,12 +11,12 @@ module {
     };
 
     public func freeze_account(token : T.TokenData, account : Principal, owner : Principal, caller : Principal) : FreezeResult<()> {
-        if (is_frozen(token, account)) {
-            return #err("Account is already frozen");
-        };
-        
         if (caller != owner) {
             return #err("Only owner can freeze accounts");
+        };
+        
+        if (is_frozen(token, account)) {
+            return #err("Account is already frozen");
         };
 
         if (account == owner) {

@@ -106,11 +106,11 @@ shared ({ caller = _owner }) actor class Token(
     };
 
     // freeze
-    public shared ({ caller }) func freeze_account(account : Principal) : async () {
+    public shared ({ caller }) func freeze_account(account : Principal) : async { #ok : (); #err : Text } {
         Freeze.freeze_account(token, account, _owner, caller);
     };
 
-    public shared ({ caller }) func unfreeze_account(account : Principal) : async () {
+    public shared ({ caller }) func unfreeze_account(account : Principal) : async { #ok : (); #err : Text } {
         Freeze.unfreeze_account(token, account, _owner, caller);
     };
 
