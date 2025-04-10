@@ -36,14 +36,14 @@ dfx deploy icrc --argument '( record {
     symbol = "aaa";
     decimals = 8;
     fee = 1_000;
-    max_supply = 100_000_000_000_000;
+    max_supply = 1_000_000_000_000_000;
     initial_balances = vec {
         record {
             record {
                 owner = principal "hbvut-2ui4m-jkj3c-ey43g-lbtbp-abta2-w7sgj-q4lqx-s6mrb-uqqd4-mqe";
                 subaccount = null;
             };
-            100_000_000_000_000
+            500_000_000
         };
     };
     min_burn_amount = 10_000;
@@ -57,7 +57,7 @@ dfx deploy icrc --argument '( record {
 
 ### Additional Configuration:
 advanced_settings:
-```sh
+```
 type AdvancedSettings = {
     burned_tokens : Balance;
     transaction_window : Timestamp;
