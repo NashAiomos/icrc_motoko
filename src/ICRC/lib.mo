@@ -539,13 +539,21 @@ module {
                     };
                     case (null) {};
                 };
-                // 使用账本费用 token._fee
-                let provided_fee = switch (args.fee) { case (?f) f; case null 0 };
-                if (provided_fee < token._fee) {
-                    return #Err(#GenericError { 
-                        error_code = 400;
-                        message = "Provided fee is less than ledger fee"
-                    });
+                switch(args.fee) {
+                    case (?provided_fee) {
+                        if (provided_fee != token._fee) { 
+                            return #Err(#GenericError { 
+                                error_code = 400;
+                                message = "BadFee: provided fee is not equal to ledger fee"
+                            });
+                        };
+                    };
+                    case (null) {
+                        return #Err(#GenericError { 
+                            error_code = 400;
+                            message = "BadFee: fee is required"
+                        });
+                    }
                 };
                 if (info.allowance < (args.amount + token._fee)) {
                     return #Err(#GenericError { 
@@ -553,7 +561,6 @@ module {
                         message = "Insufficient allowance"
                     });
                 };
-                // 更新授权额度
                 let new_allowance = info.allowance - (args.amount + token._fee);
                 StableTrieMap.put(
                     token.allowances,
@@ -571,22 +578,25 @@ module {
             }
         };
 
-        let memo_blob = ?Blob.fromArray([]);
-        
-        // 调用 transfer 函数进行转账
+        // 构造 transfer_args，对 memo 与 created_at_time 提供默认值以保证完整性
         let transfer_args : T.TransferArgs = {
             from_subaccount = args.from.subaccount;
             to = args.to;
             amount = args.amount;
-            fee = args.fee; // 可保留原传入值，但后续使用账本费用
-            memo = args.memo;
-            created_at_time = args.created_at_time;
+            fee = args.fee;
+            memo = switch (args.memo) { case (?m) { m }; case null { Blob.fromArray([]) } };
+            created_at_time = switch (args.created_at_time) { case (?t) { t }; case null { Time.now() } };
         };
 
-        // 生成交易请求、处理余额变更、存储交易等
+        // 生成交易请求，调用转账函数中相同的验证逻辑
         let tx_req = Utils.create_transfer_req(transfer_args, args.from.owner, #transfer);
+        switch (Transfer.validate_request(token, tx_req)) {
+            case (#err(errorType)) { return #Err(errorType); };
+            case (#ok(_)) {};
+        };
+
+        // 处理交易：转账、燃烧手续费、存储交易及归档
         Utils.transfer_balance(token, tx_req);
-        // 始终燃烧账本费用
         Utils.burn_balance(token, tx_req.encoded.from, token._fee);
         let index = SB.size(token.transactions) + token.archive.stored_txs;
         let tx = Utils.req_to_tx(tx_req, index);
