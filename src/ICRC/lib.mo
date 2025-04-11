@@ -442,43 +442,33 @@ module {
     public func approve(token : T.TokenData, args : T.ApproveArgs, caller : Principal) : { #Ok : Nat; #Err : T.ApproveError } {
         // 验证调用者非匿名
         if (Principal.isAnonymous(caller)) {
-            return #Err(#GenericError { 
-                error_code = 401; 
+            return #Err(#GenericError {
+                error_code = 401;
                 message = "Anonymous caller not allowed"
             });
         };
 
         // 验证 spender 不等于发起者自己
         if (args.spender.owner == caller) {
-            return #Err(#GenericError { 
-                error_code = 400; 
+            return #Err(#GenericError {
+                error_code = 400;
                 message = "Cannot approve self"
             });
         };
         
         // 验证 spender 账户
         if (not Account.validate(args.spender)) {
-            return #Err(#GenericError { 
-                error_code = 400; 
+            return #Err(#GenericError {
+                error_code = 400;
                 message = "Invalid spender account"
             });
         };
 
         // 检查冻结状态
         if (Freeze.is_frozen(token, caller)) {
-            return #Err(#GenericError { 
-                error_code = 403; 
+            return #Err(#GenericError {
+                error_code = 403;
                 message = "Frozen account cannot approve transfers"
-            });
-        };
-
-        // 获取账户余额并检查
-        let caller_account : T.Account = { owner = caller; subaccount = args.from_subaccount };
-        let caller_balance = balance_of(token, caller_account);
-        if (args.amount > caller_balance) {
-            return #Err(#GenericError { 
-                error_code = 400;
-                message = "Insufficient balance for approval"
             });
         };
 
@@ -487,13 +477,14 @@ module {
         let spender_encoded = Account.encode(args.spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         
-        // 如设置 expected_allowance 则要求当前值匹配
+        // 将 null 默认解析为 0 ，然后与当前额度做一致性校验
         let current = StableTrieMap.get(token.allowances, Blob.equal, Blob.hash, key);
         let current_allowance = switch (current) {
             case (?info) { info.allowance };
             case (_) { 0 };
         };
-        if (args.expected_allowance != null and Option.get(args.expected_allowance, 0) != current_allowance) {
+        let expected : Nat = Option.get(args.expected_allowance, 0);
+        if (expected != current_allowance) {
             return #Err(#AllowanceChanged { current_allowance });
         };
 
