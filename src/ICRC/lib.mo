@@ -539,15 +539,22 @@ module {
                     };
                     case (null) {};
                 };
-                let fee_val = switch (args.fee) { case (?f) f; case null 0 };
-                if (info.allowance < (args.amount + fee_val)) {
+                // 使用账本费用 token._fee
+                let provided_fee = switch (args.fee) { case (?f) f; case null 0 };
+                if (provided_fee < token._fee) {
+                    return #Err(#GenericError { 
+                        error_code = 400;
+                        message = "Provided fee is less than ledger fee"
+                    });
+                };
+                if (info.allowance < (args.amount + token._fee)) {
                     return #Err(#GenericError { 
                         error_code = 400;
                         message = "Insufficient allowance"
                     });
                 };
                 // 更新授权额度
-                let new_allowance = info.allowance - (args.amount + fee_val);
+                let new_allowance = info.allowance - (args.amount + token._fee);
                 StableTrieMap.put(
                     token.allowances,
                     Blob.equal,
@@ -571,7 +578,7 @@ module {
             from_subaccount = args.from.subaccount;
             to = args.to;
             amount = args.amount;
-            fee = args.fee;
+            fee = args.fee; // 可保留原传入值，但后续使用账本费用
             memo = args.memo;
             created_at_time = args.created_at_time;
         };
@@ -579,9 +586,8 @@ module {
         // 生成交易请求、处理余额变更、存储交易等
         let tx_req = Utils.create_transfer_req(transfer_args, args.from.owner, #transfer);
         Utils.transfer_balance(token, tx_req);
-        if (args.fee != null and token._fee > 0) {
-            Utils.burn_balance(token, tx_req.encoded.from, token._fee);
-        };
+        // 始终燃烧账本费用
+        Utils.burn_balance(token, tx_req.encoded.from, token._fee);
         let index = SB.size(token.transactions) + token.archive.stored_txs;
         let tx = Utils.req_to_tx(tx_req, index);
         SB.add(token.transactions, tx);
