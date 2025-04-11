@@ -472,8 +472,14 @@ module {
             });
         };
 
-        // 构造授权 key
-        let owner_encoded = Account.encode(caller);
+        // 构造 caller 的 Account 对象
+        let caller_account : T.Account = {
+            owner = caller;
+            subaccount = args.from_subaccount;
+        };
+
+        // 构造授权 key - 使用完整的 Account 对象
+        let owner_encoded = Account.encode(caller_account);
         let spender_encoded = Account.encode(args.spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         
@@ -531,9 +537,9 @@ module {
                 switch(info.expires_at) {
                     case (?expire_time) {
                         if (now > expire_time) {
-                            // 删除过期的批准
-                            StableTrieMap.remove(token.allowances, Blob.equal, Blob.hash, key);
-                            return #Err(#InsufficientAllowance);
+                            // 删除过期的批准,使用 ignore 处理返回值
+                            ignore StableTrieMap.remove(token.allowances, Blob.equal, Blob.hash, key);
+                            return #Err(#InsufficientFunds { balance = 0 });
                         };
                     };
                     case (null) {};
@@ -561,7 +567,8 @@ module {
                     });
                 };
                 let new_allowance = info.allowance - (args.amount + token._fee);
-                StableTrieMap.put(
+                // 更新授权额度,使用 ignore 处理返回值 
+                ignore StableTrieMap.put(
                     token.allowances,
                     Blob.equal,
                     Blob.hash,
@@ -570,10 +577,7 @@ module {
                 );
             };
             case (_) {
-                return #Err(#GenericError { 
-                    error_code = 400;
-                    message = "No allowance found"
-                });
+                return #Err(#InsufficientFunds { balance = 0 });
             }
         };
 
@@ -583,8 +587,8 @@ module {
             to = args.to;
             amount = args.amount;
             fee = args.fee;
-            memo = switch (args.memo) { case (?m) { m }; case null { Some(Blob.fromArray([])) } };
-            created_at_time = switch (args.created_at_time) { case (?t) { t }; case null { Some(Time.now()) } };
+            memo = args.memo;
+            created_at_time = args.created_at_time;
         };
 
         // 生成交易请求，调用转账函数中相同的验证逻辑
