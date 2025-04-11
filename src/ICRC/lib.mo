@@ -473,7 +473,7 @@ module {
         };
 
         // 构造授权 key
-        let owner_encoded = Account.encode(caller_account);
+        let owner_encoded = Account.encode(caller);
         let spender_encoded = Account.encode(args.spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         
@@ -531,10 +531,9 @@ module {
                 switch(info.expires_at) {
                     case (?expire_time) {
                         if (now > expire_time) {
-                            return #Err(#GenericError { 
-                                error_code = 400;
-                                message = "Allowance expired"
-                            });
+                            // 删除过期的批准
+                            StableTrieMap.remove(token.allowances, Blob.equal, Blob.hash, key);
+                            return #Err(#InsufficientAllowance);
                         };
                     };
                     case (null) {};
@@ -584,8 +583,8 @@ module {
             to = args.to;
             amount = args.amount;
             fee = args.fee;
-            memo = switch (args.memo) { case (?m) { m }; case null { Blob.fromArray([]) } };
-            created_at_time = switch (args.created_at_time) { case (?t) { t }; case null { Time.now() } };
+            memo = switch (args.memo) { case (?m) { m }; case null { Some(Blob.fromArray([])) } };
+            created_at_time = switch (args.created_at_time) { case (?t) { t }; case null { Some(Time.now()) } };
         };
 
         // 生成交易请求，调用转账函数中相同的验证逻辑
@@ -606,20 +605,31 @@ module {
     };
 
     // 授权查询函数
-    public func allowance(token : T.TokenData, args : { owner : T.Account; spender : T.Account }) : async { allowance : T.Balance; expires_at : ?T.Timestamp } {
-
+    public func allowance(token : T.TokenData, args : { owner : T.Account; spender : T.Account }) : { allowance : T.Balance; expires_at : ?T.Timestamp } {
         // 验证 owner 和 spender 账户
         if (not Account.validate(args.owner) or not Account.validate(args.spender)) {
-            Debug.trap("Invalid account");
+            // 返回默认值而不是抛出异常
+            return { allowance = 0; expires_at = null };
         };
-
         let owner_encoded = Account.encode(args.owner);
         let spender_encoded = Account.encode(args.spender);
         let key = Utils.encode_allowance(owner_encoded, spender_encoded);
         let opt_allowance = StableTrieMap.get(token.allowances, Blob.equal, Blob.hash, key);
         switch (opt_allowance) {
-            case (?info) { { allowance = info.allowance; expires_at = info.expires_at } };
-            case (_) { { allowance = 0; expires_at = null } }
+            case (?info) {
+                let now = Nat64.fromNat(Int.abs(Time.now()));
+                // 检查授权是否过期
+                switch(info.expires_at) {
+                    case (?expire_time) {
+                        if (now > expire_time) {
+                            return { allowance = 0; expires_at = null };
+                        };
+                    };
+                    case (null) {};
+                };
+                return { allowance = info.allowance; expires_at = info.expires_at };
+            };
+            case (_) { return { allowance = 0; expires_at = null } }
         }
     };
 
