@@ -2,8 +2,6 @@
 
 ```sh
 cd code/icrc_motoko
-export PATH="$PATH:/home/neutronstarpro/npm/bin"
-source ~/.bashrc
 dfx start --background --clean
 dfx deploy icrc --argument '( record {
     name = "aaa";
